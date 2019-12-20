@@ -28,20 +28,22 @@ int main(int argc, char* argv[]) {
     consoleInit(NULL);
 
     printf("pmshellInitialize(): %x\n", pmshellInitialize());
-    printf("stopBackgroundService(): %x\n", stopBackgroundService());
-    printf("startBackgroundService(): %x\n", startBackgroundService());
-    pmshellExit();
 
     while (appletMainLoop()) {
         hidScanInput();
-
         u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
 
         if (kDown & KEY_PLUS) break;  // break in order to return to hbmenu
         
+        if (kDown & KEY_A) {
+            printf("stopBackgroundService(): %x\n", stopBackgroundService());
+            printf("startBackgroundService(): %x\n", startBackgroundService());
+        }
+
         consoleUpdate(NULL);
     }
 
+    pmshellExit();
     consoleExit(NULL);
     return 0;
 }
