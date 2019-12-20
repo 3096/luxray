@@ -45,3 +45,4 @@ release
 # Other
 logs
 .vscode
+*.py
