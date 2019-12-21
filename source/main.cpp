@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <memory>
 #include <string>
 
 #include <switch.h>
 
 #include "debug.hpp"
+#include "overlay.hpp"
 #include "util.hpp"
 
 extern "C" {
@@ -16,7 +18,6 @@ char nx_inner_heap[INNER_HEAP_SIZE];
 u32 __nx_nv_transfermem_size = 0x15000;
 
 void __libnx_initheap(void);
-void __libnx_exception_handler(ThreadExceptionDump* ctx);
 void __appInit(void);
 void __appExit(void);
 }
@@ -52,7 +53,18 @@ int main(int argc, char* argv[]) {
     debugInit();
 
     // main loop
-    LOG("Test");
+    try {
+        LOG("Making Overlay obj");
+        auto p_overlay = std::make_unique<Overlay>();
+
+        LOG("p_overlay->testFrameBuf();");
+        p_overlay->testFrameBuf();
+
+        LOG("Enter empty loop");
+        while (true) svcSleepThread(10'000'000);
+    } catch (std::runtime_error* e) {
+        LOG("Overlay exception: %s", e->what());
+    }
 
     // Deinitialization and resources clean up
     debugExit();
