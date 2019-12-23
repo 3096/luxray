@@ -8,7 +8,7 @@ void __libnx_exception_handler(ThreadExceptionDump* ctx) {
     MemoryInfo mem_info;
     u32 page_info;
     svcQueryMemory(&mem_info, &page_info, ctx->pc.x);
-    LOG("%#x exception with pc=%#lx\n", ctx->error_desc, ctx->pc.x - mem_info.addr);
+    LOG("%#x exception with pc=%#lx", ctx->error_desc, ctx->pc.x - mem_info.addr);
 }
 }
 #endif

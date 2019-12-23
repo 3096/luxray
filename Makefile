@@ -39,7 +39,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source source/lvgl/src/lv_core source/lvgl/src/lv_draw source/lvgl/src/lv_font source/lvgl/src/lv_hal source/lvgl/src/lv_misc source/lvgl/src/lv_objx source/lvgl/src/lv_themes # temporary until I learn a better way to do this...
 DATA		:=	data
 INCLUDES	:=	include
 #ROMFS	:=	romfs

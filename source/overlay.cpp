@@ -2,7 +2,9 @@
 
 extern "C" u64 __nx_vi_layer_id;
 
-Overlay::Overlay(/* args */) {
+extern Overlay* gp_overlay;
+
+Overlay::Overlay() {
     LOG("Initialize Overlay");
 
     TRY_GOTO(viInitialize(ViServiceType_Manager), end);
@@ -15,8 +17,15 @@ Overlay::Overlay(/* args */) {
     TRY_GOTO(viSetLayerSize(&m_viLayer, LAYER_WIDTH, LAYER_HEIGHT), close_managed_layer);
     TRY_GOTO(viSetLayerPosition(&m_viLayer, LAYER_X, LAYER_Y), close_managed_layer);
     TRY_GOTO(nwindowCreateFromLayer(&this->m_nWindow, &this->m_viLayer), close_managed_layer);
-    TRY_GOTO(framebufferCreate(&this->m_frameBuffer, &this->m_nWindow, FB_WIDTH, FB_HEIGHT, PIXEL_FORMAT_RGBA_4444, 1),
+    TRY_GOTO(framebufferCreate(&this->m_frameBuffer, &this->m_nWindow, FB_WIDTH, FB_HEIGHT, PIXEL_FORMAT_BGRA_8888, 1),
              close_window);
+
+    lv_init();
+    lv_disp_drv_init(&m_dispDrv);
+    lv_disp_buf_init(&m_dispBuf, &m_renderBuf, NULL, LV_HOR_RES_MAX * LV_VER_RES_MAX);
+    m_dispDrv.buffer = &m_dispBuf;
+    m_dispDrv.flush_cb = Overlay::flushBuffer;
+    lv_disp_drv_register(&m_dispDrv);
 
     return;
 
@@ -42,4 +51,26 @@ Overlay::~Overlay() {
     viExit();
 }
 
-void* Overlay::getCurFramebuf() { return (rgba4444_t*)m_frameBuffer.buf + m_frameBuffer.fb_size * m_nWindow.cur_slot; }
+Framebuffer* Overlay::getFb_() { return &m_frameBuffer; }
+
+void Overlay::flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvColor) {
+    Framebuffer* p_fb = gp_overlay->getFb_();
+    lv_color_t* p_frameBuf = (lv_color_t*)framebufferBegin(p_fb, nullptr);
+
+    // https://github.com/switchbrew/libnx/blob/v1.6.0/nx/include/switch/display/gfx.h#L106-L119
+    for (int y = p_area->y1; y <= p_area->y2; y++) {
+        for (int x = p_area->x1; x <= p_area->x2; x++) {
+            u32 swizzledPos;
+            swizzledPos = ((y & 127) / 16) + (x / 16 * 8) + ((y / 16 / 8) * (FB_WIDTH / 16 * 8));
+            swizzledPos *= 16 * 16 * 4;
+            swizzledPos += ((y % 16) / 8) * 512 + ((x % 16) / 8) * 256 + ((y % 8) / 2) * 64 + ((x % 8) / 4) * 32 +
+                           (y % 2) * 16 + (x % 4) * 4;
+            swizzledPos /= 4;
+            p_frameBuf[swizzledPos] = *p_lvColor;
+            p_lvColor++;
+        }
+    }
+
+    framebufferEnd(p_fb);
+    lv_disp_flush_ready(p_disp);
+}

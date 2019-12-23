@@ -22,8 +22,10 @@ extern FILE* g_debug_file;
 #else
 #    define LOG(...) ({})
 #endif
-#define LOG32(v) LOG(STRINGIFY(v) " = 0x%u\n", v)
-#define LOG64(v) LOG(STRINGIFY(v) " = 0x%lu\n", v)
+#define LOG32(v) LOG(STRINGIFY(v) " = %d", v)
+#define LOG64(v) LOG(STRINGIFY(v) " = %ld", v)
+#define LOG32X(v) LOG(STRINGIFY(v) " = 0x%x", v)
+#define LOG64X(v) LOG(STRINGIFY(v) " = 0x%lx", v)
 
 void debugInit();
 

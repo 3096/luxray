@@ -13,7 +13,7 @@ extern FILE *g_debug_file;
 
 #define TRY(x, cb) ({ \
 	if (Result rc = (x); R_FAILED(rc)) { \
-		LOG(STRINGIFY(x) " failed: %#x\n", rc); \
+		LOG(STRINGIFY(x) " failed: %#x", rc); \
 		({cb;}); \
 	} \
 })

@@ -9,10 +9,12 @@
 #include "overlay.hpp"
 #include "util.hpp"
 
+#include "lvgl/lvgl.h"
+
 extern "C" {
 u32 __nx_applet_type = AppletType_None;
 
-#define INNER_HEAP_SIZE 0x50000
+#define INNER_HEAP_SIZE 0x300000 // temp for testing
 char nx_inner_heap[INNER_HEAP_SIZE];
 
 u32 __nx_nv_transfermem_size = 0x15000;
@@ -21,6 +23,8 @@ void __libnx_initheap(void);
 void __appInit(void);
 void __appExit(void);
 }
+
+Overlay* gp_overlay;
 
 void __libnx_initheap(void) {
     extern char* fake_heap_start;
@@ -36,11 +40,25 @@ void __appInit(void) {
     TRY(fsInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_FS)));
     TRY(timeInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_Time)));
     // __libnx_init_time();
+
     fsdevMountSdmc();
+    debugInit();
+
+    LOG("Service init");
+
+    try {
+        gp_overlay = new Overlay();
+    } catch (std::runtime_error& e) {
+        LOG("runtime_error: %s", e.what());
+        fatalThrow(MAKERESULT(405, 0));
+    }
 }
 
 void __appExit(void) {
     // Cleanup services.
+    LOG("Service cleanup");
+    delete gp_overlay;
+    debugExit();
     fsdevUnmountAll();
     fsExit();
     timeExit();
@@ -50,23 +68,28 @@ void __appExit(void) {
 
 int main(int argc, char* argv[]) {
     // Initialization
-    debugInit();
+    LOG("Main start");
+
+    // lv_examples hello world
+    LOG("Hello world example");
+    lv_obj_t* scr = lv_disp_get_scr_act(NULL); /*Get the current screen*/
+    /*Create a Label on the currently active screen*/
+    lv_obj_t* label1 = lv_label_create(scr, NULL);
+    /*Modify the Label's text*/
+    lv_label_set_text(label1, "Hello world!");
+    /* Align the Label to the center
+     * NULL means align on parent (which is the screen now)
+     * 0, 0 at the end means an x, y offset after alignment*/
+    lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
 
     // main loop
-    try {
-        LOG("Making Overlay obj");
-        auto p_overlay = std::make_unique<Overlay>();
-
-        LOG("p_overlay->testFrameBuf();");
-        p_overlay->testFrameBuf();
-
-        LOG("Enter empty loop");
-        while (true) svcSleepThread(10'000'000);
-    } catch (std::runtime_error* e) {
-        LOG("Overlay exception: %s", e->what());
+    LOG("Enter loop");
+    while (true) {
+        lv_task_handler();
+        svcSleepThread(10'000'000);
     }
 
     // Deinitialization and resources clean up
-    debugExit();
+    LOG("Main exit");
     return 0;
 }

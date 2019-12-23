@@ -46,3 +46,4 @@ release
 logs
 .vscode
 *.py
+test
