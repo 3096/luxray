@@ -16,22 +16,38 @@ Overlay::Overlay() {
     TRY_GOTO(viSetLayerZ(&m_viLayer, 100), close_managed_layer);  // Arbitrary z index
     TRY_GOTO(viSetLayerSize(&m_viLayer, OVERLAY_WIDTH, OVERLAY_HEIGHT), close_managed_layer);
     TRY_GOTO(viSetLayerPosition(&m_viLayer, OVERLAY_POS_X, OVERLAY_POS_Y), close_managed_layer);
-    TRY_GOTO(nwindowCreateFromLayer(&this->m_nWindow, &this->m_viLayer), close_managed_layer);
-    TRY_GOTO(framebufferCreate(&this->m_frameBuffer, &this->m_nWindow, OVERLAY_WIDTH, OVERLAY_HEIGHT,
-                               PIXEL_FORMAT_BGRA_8888, 1),
-             close_window);
+    TRY_GOTO(nwindowCreateFromLayer(&m_nWindow, &m_viLayer), close_managed_layer);
+    TRY_GOTO(
+        framebufferCreate(&m_frameBufferInfo, &m_nWindow, OVERLAY_WIDTH, OVERLAY_HEIGHT, PIXEL_FORMAT_BGRA_8888, 2),
+        close_window);
+#if USE_LINEAR_BUF
+    TRY_GOTO(framebufferMakeLinear(&m_frameBufferInfo), close_fb);
+#endif
+    mp_frameBuffers[0] = m_frameBufferInfo.buf;
+    mp_frameBuffers[1] = (lv_color_t*)m_frameBufferInfo.buf + OVERLAY_BUF_LENGTH;
+    
     LOG("libnx initialized");
 
     lv_init();
     lv_disp_drv_init(&m_dispDrv);
-    lv_disp_buf_init(&m_dispBuf, &m_renderBuf, NULL, OVERLAY_BUF_LENGTH);
-    m_dispDrv.buffer = &m_dispBuf;
-    m_dispDrv.flush_cb = Overlay::flushBuffer;
+    lv_disp_buf_init(&m_dispBufferInfo, mp_renderBuf, nullptr, OVERLAY_BUF_LENGTH);
+    m_dispDrv.buffer = &m_dispBufferInfo;
+    m_dispDrv.flush_cb = flushBuffer;
     lv_disp_drv_register(&m_dispDrv);
+
+    lv_indev_drv_init(&m_touchDrv);
+    m_touchDrv.type = LV_INDEV_TYPE_POINTER;
+    m_touchDrv.read_cb = touchRead;
+    lv_indev_drv_register(&m_touchDrv);
+
     LOG("lv initialized");
 
     return;
 
+#if USE_LINEAR_BUF
+close_fb:
+    framebufferClose(&m_frameBufferInfo);
+#endif
 close_window:
     nwindowClose(&m_nWindow);
 close_managed_layer:
@@ -47,18 +63,32 @@ end:
 Overlay::~Overlay() {
     LOG("Exit Overlay");
 
-    framebufferClose(&m_frameBuffer);
+    framebufferClose(&m_frameBufferInfo);
     nwindowClose(&m_nWindow);
     viDestroyManagedLayer(&m_viLayer);
     viCloseDisplay(&m_viDisplay);
     viExit();
 }
 
-Framebuffer* Overlay::getFb_() { return &m_frameBuffer; }
+Framebuffer* Overlay::getFbInfo_() { return &m_frameBufferInfo; }
+
+void Overlay::copyPrivFb() {
+    std::memcpy(mp_frameBuffers[m_nWindow.cur_slot], mp_frameBuffers[m_nWindow.cur_slot ^ 1],
+                m_frameBufferInfo.fb_size);
+}
 
 void Overlay::flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvColor) {
-    Framebuffer* p_fb = gp_overlay->getFb_();
-    lv_color_t* p_frameBuf = (lv_color_t*)framebufferBegin(p_fb, nullptr);
+    Framebuffer* p_fbInfo = gp_overlay->getFbInfo_();
+    lv_color_t* p_frameBuf = (lv_color_t*)framebufferBegin(p_fbInfo, nullptr);
+
+#if USE_LINEAR_BUF
+    int renderWidth = p_area->x2 - p_area->x1 + 1;
+    for (int y = p_area->y1; y <= p_area->y2; y++) {
+        std::memcpy(&p_frameBuf[y * OVERLAY_WIDTH + p_area->x1], p_lvColor, renderWidth * sizeof(lv_color_t));
+        p_lvColor += renderWidth;
+    }
+#else
+    gp_overlay->copyPrivFb();
 
     // https://github.com/switchbrew/libnx/blob/v1.6.0/nx/include/switch/display/gfx.h#L106-L119
     for (int y = p_area->y1; y <= p_area->y2; y++) {
@@ -72,7 +102,25 @@ void Overlay::flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_col
             p_lvColor++;
         }
     }
+#endif
 
-    framebufferEnd(p_fb);
+    framebufferEnd(p_fbInfo);
     lv_disp_flush_ready(p_disp);
+}
+
+bool Overlay::touchRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
+    /*Save the state and save the pressed coordinate*/
+    hidScanInput();
+    data->state = hidTouchCount() > 0 ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+    if (data->state == LV_INDEV_STATE_PR) {
+        touchPosition touch;
+        hidTouchRead(&touch, 0);
+        data->point.x = touch.px * SCREEN_WIDTH / SCREEN_WIDTH_HANDHELD - OVERLAY_POS_X;
+        data->point.y = touch.py * SCREEN_HEIGHT / SCREEN_HEIGHT_HANDHELD - OVERLAY_POS_Y;
+    } else {
+        data->point.x = 0;
+        data->point.y = 0;
+    }
+
+    return false; /*Return `false` because we are not buffering and no more data to read*/
 }

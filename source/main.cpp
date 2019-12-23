@@ -14,7 +14,7 @@
 extern "C" {
 u32 __nx_applet_type = AppletType_None;
 
-#define INNER_HEAP_SIZE 0x500000  // temp for testing
+#define INNER_HEAP_SIZE 0x1000000  // temp for testing
 char nx_inner_heap[INNER_HEAP_SIZE];
 
 u32 __nx_nv_transfermem_size = 0x15000;
