@@ -14,14 +14,15 @@
 /* clang-format off */
 
 #include <stdint.h>
+#include "config.h"
 
 /*====================
    Graphical settings
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#define LV_HOR_RES_MAX          (320)
-#define LV_VER_RES_MAX          (384)
+#define LV_HOR_RES_MAX          OVERLAY_WIDTH
+#define LV_VER_RES_MAX          OVERLAY_HEIGHT
 
 /* Color depth:
  * - 1:  1 byte per pixel
@@ -286,7 +287,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 #define LV_USE_THEME_ALIEN      0   /*Dark futuristic theme*/
 #define LV_USE_THEME_NIGHT      0   /*Dark elegant theme*/
 #define LV_USE_THEME_MONO       0   /*Mono color theme for monochrome displays*/
-#define LV_USE_THEME_MATERIAL   0   /*Flat theme with bold colors and light shadows*/
+#define LV_USE_THEME_MATERIAL   1   /*Flat theme with bold colors and light shadows*/
 #define LV_USE_THEME_ZEN        0   /*Peaceful, mainly light theme */
 #define LV_USE_THEME_NEMO       0   /*Water-like theme based on the movie "Finding Nemo"*/
 
@@ -302,10 +303,10 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 /* Robot fonts with bpp = 4
  * https://fonts.google.com/specimen/Roboto  */
-#define LV_FONT_ROBOTO_12    0
+#define LV_FONT_ROBOTO_12    1
 #define LV_FONT_ROBOTO_16    1
-#define LV_FONT_ROBOTO_22    0
-#define LV_FONT_ROBOTO_28    0
+#define LV_FONT_ROBOTO_22    1
+#define LV_FONT_ROBOTO_28    1
 
 /* Demonstrate special features */
 #define LV_FONT_ROBOTO_12_SUBPX 1

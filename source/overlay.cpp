@@ -14,18 +14,21 @@ Overlay::Overlay() {
     TRY_GOTO(viCreateLayer(&m_viDisplay, &m_viLayer), close_managed_layer);
     TRY_GOTO(viSetLayerScalingMode(&m_viLayer, ViScalingMode_FitToLayer), close_managed_layer);
     TRY_GOTO(viSetLayerZ(&m_viLayer, 100), close_managed_layer);  // Arbitrary z index
-    TRY_GOTO(viSetLayerSize(&m_viLayer, LAYER_WIDTH, LAYER_HEIGHT), close_managed_layer);
-    TRY_GOTO(viSetLayerPosition(&m_viLayer, LAYER_X, LAYER_Y), close_managed_layer);
+    TRY_GOTO(viSetLayerSize(&m_viLayer, OVERLAY_WIDTH, OVERLAY_HEIGHT), close_managed_layer);
+    TRY_GOTO(viSetLayerPosition(&m_viLayer, OVERLAY_POS_X, OVERLAY_POS_Y), close_managed_layer);
     TRY_GOTO(nwindowCreateFromLayer(&this->m_nWindow, &this->m_viLayer), close_managed_layer);
-    TRY_GOTO(framebufferCreate(&this->m_frameBuffer, &this->m_nWindow, FB_WIDTH, FB_HEIGHT, PIXEL_FORMAT_BGRA_8888, 1),
+    TRY_GOTO(framebufferCreate(&this->m_frameBuffer, &this->m_nWindow, OVERLAY_WIDTH, OVERLAY_HEIGHT,
+                               PIXEL_FORMAT_BGRA_8888, 1),
              close_window);
+    LOG("libnx initialized");
 
     lv_init();
     lv_disp_drv_init(&m_dispDrv);
-    lv_disp_buf_init(&m_dispBuf, &m_renderBuf, NULL, LV_HOR_RES_MAX * LV_VER_RES_MAX);
+    lv_disp_buf_init(&m_dispBuf, &m_renderBuf, NULL, OVERLAY_BUF_LENGTH);
     m_dispDrv.buffer = &m_dispBuf;
     m_dispDrv.flush_cb = Overlay::flushBuffer;
     lv_disp_drv_register(&m_dispDrv);
+    LOG("lv initialized");
 
     return;
 
@@ -42,7 +45,7 @@ end:
 }
 
 Overlay::~Overlay() {
-    LOG("Finalize Overlay");
+    LOG("Exit Overlay");
 
     framebufferClose(&m_frameBuffer);
     nwindowClose(&m_nWindow);
@@ -60,8 +63,7 @@ void Overlay::flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_col
     // https://github.com/switchbrew/libnx/blob/v1.6.0/nx/include/switch/display/gfx.h#L106-L119
     for (int y = p_area->y1; y <= p_area->y2; y++) {
         for (int x = p_area->x1; x <= p_area->x2; x++) {
-            u32 swizzledPos;
-            swizzledPos = ((y & 127) / 16) + (x / 16 * 8) + ((y / 16 / 8) * (FB_WIDTH / 16 * 8));
+            u32 swizzledPos = ((y & 127) / 16) + (x / 16 * 8) + ((y / 16 / 8) * (OVERLAY_WIDTH / 16 * 8));
             swizzledPos *= 16 * 16 * 4;
             swizzledPos += ((y % 16) / 8) * 512 + ((x % 16) / 8) * 256 + ((y % 8) / 2) * 64 + ((x % 8) / 4) * 32 +
                            (y % 2) * 16 + (x % 4) * 4;

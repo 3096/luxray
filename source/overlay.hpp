@@ -6,25 +6,20 @@
 #include <stdexcept>
 
 #include "color.hpp"
+#include "config.h"
 #include "debug.hpp"
-
 #include "lvgl/lvgl.h"
 
 class Overlay {
    private:
     // Handheld and docked
-    static const int SCREEN_WIDTH = 1920;
-    static const int SCREEN_HEIGHT = 1080;
+    // static constexpr u_int32_t SCREEN_WIDTH = 1920;
+    // static constexpr u_int32_t SCREEN_HEIGHT = 1080;
 
-    // width * height page-aligned
-    static const int FB_BYTES_PER_PIXEL = sizeof(lv_color_t);
-    static const int FB_WIDTH = 320;   // Aligned (* bpp) to 64
-    static const int FB_HEIGHT = 384;  // Aligned to 128
+    static constexpr size_t OVERLAY_BUF_LENGTH = OVERLAY_WIDTH * OVERLAY_HEIGHT;
 
-    static constexpr float LAYER_X = 0;
-    static constexpr float LAYER_Y = 384;
-    static const int LAYER_WIDTH = FB_WIDTH;  // Can be different from fb values (will be up/downscaled)
-    static const int LAYER_HEIGHT = FB_HEIGHT;
+    static constexpr float OVERLAY_POS_X = 0;
+    static constexpr float OVERLAY_POS_Y = OVERLAY_HEIGHT_BASE * 2 - OVERLAY_HEIGHT_BASE * OVERLAY_SCALE;
 
     ViDisplay m_viDisplay;
     ViLayer m_viLayer;
@@ -33,7 +28,7 @@ class Overlay {
 
     lv_disp_drv_t m_dispDrv;
     lv_disp_buf_t m_dispBuf;
-    lv_color_t m_renderBuf[LV_HOR_RES_MAX * LV_VER_RES_MAX];  // TODO: make this FB_WIDTH * FB_HEIGHT
+    lv_color_t m_renderBuf[OVERLAY_BUF_LENGTH];
 
     Framebuffer* getFb_();
 

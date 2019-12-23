@@ -1,3 +1,5 @@
-# Luxray
+# LuxrayVision
+#### ... the Gleam Eyes Pokémon. Its eyes can see through anything. It can even spot its prey hiding in the shadows.
+---
 
-TODO
+LuxrayVision is an overlay utility for Pokémon in the form of a sysmodule.
