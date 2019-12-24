@@ -10,8 +10,6 @@
 #include "util.hpp"
 
 #include "lvgl/lvgl.h"
-#include "lv_examples/lv_tutorial/10_keyboard/lv_tutorial_keyboard.h"
-#include "lv_examples/lv_tutorial/2_objects/lv_tutorial_objects.h"
 
 extern "C" {
 u32 __nx_applet_type = AppletType_None;
@@ -69,24 +67,11 @@ void __appExit(void) {
 }
 
 int main(int argc, char* argv[]) {
-    // Initialization
     LOG("Main start");
 
-    // lv_examples hello world
-    LOG("LV example test");
-    lv_theme_set_current(lv_theme_material_init(210, NULL));
-    // lv_tutorial_keyboard(gp_overlay->mp_keyIn);
-    lv_tutorial_objects();
-
-    // main loop
-    LOG("Enter loop");
-    while (true) {
-        hidScanInput();
-        lv_task_handler();
-        svcSleepThread(10'000'000);
-    }
-
-    // Deinitialization and resources clean up
+    gp_overlay->run();
+    
     LOG("Main exit");
+    __appExit();
     return 0;
 }

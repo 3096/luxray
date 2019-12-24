@@ -5,8 +5,6 @@ extern "C" u64 __nx_vi_layer_id;
 extern Overlay* gp_overlay;
 
 Overlay::Overlay() {
-    LOG("Initialize Overlay");
-
     TRY_GOTO(viInitialize(ViServiceType_Manager), end);
     TRY_GOTO(viOpenDefaultDisplay(&m_viDisplay), close_serv);
     TRY_GOTO(viCreateManagedLayer(&m_viDisplay, (ViLayerFlags)0, 0, &__nx_vi_layer_id),
@@ -45,7 +43,13 @@ Overlay::Overlay() {
     m_touchDrv.read_cb = touchRead;
     lv_indev_drv_register(&m_touchDrv);
 
+    lv_theme_set_current(lv_theme_material_init(210, NULL));
+
     LOG("lv initialized");
+
+    mp_mainScreen = std::make_unique<MainScreen>(nullptr);
+
+    LOG("screens initialized");
 
     return;
 
@@ -73,6 +77,10 @@ Overlay::~Overlay() {
     viDestroyManagedLayer(&m_viLayer);
     viCloseDisplay(&m_viDisplay);
     viExit();
+}
+
+void Overlay::run() {
+    mp_mainScreen->show();
 }
 
 Framebuffer* Overlay::getFbInfo_() { return &m_frameBufferInfo; }

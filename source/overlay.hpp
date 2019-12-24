@@ -5,10 +5,10 @@
 #include <memory>
 #include <stdexcept>
 
-#include "color.hpp"
 #include "config.h"
 #include "debug.hpp"
 #include "lvgl/lvgl.h"
+#include "screens/main_screen.hpp"
 
 class Overlay {
    public:
@@ -35,6 +35,8 @@ class Overlay {
     lv_indev_drv_t m_touchDrv;
     lv_indev_drv_t m_keyDrv;
 
+    std::unique_ptr<MainScreen> mp_mainScreen;
+
     inline Framebuffer* getFbInfo_();
 
    public:
@@ -43,13 +45,7 @@ class Overlay {
     Overlay();
     ~Overlay();
 
-    // temp
-    inline void testFrameBuf() {
-        lv_color_t testColor = {0xFF, 0xFF, 0, 0b00100000};
-        lv_color_t* fb = (lv_color_t*)framebufferBegin(&m_frameBufferInfo, NULL);
-        std::fill(fb, fb + m_frameBufferInfo.fb_size, testColor);
-        framebufferEnd(&m_frameBufferInfo);
-    }
+    void run();
 
     inline void copyPrivFb();
 
