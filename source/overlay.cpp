@@ -25,7 +25,7 @@ Overlay::Overlay() {
 #endif
     mp_frameBuffers[0] = m_frameBufferInfo.buf;
     mp_frameBuffers[1] = (lv_color_t*)m_frameBufferInfo.buf + OVERLAY_BUF_LENGTH;
-    
+
     LOG("libnx initialized");
 
     lv_init();
@@ -34,6 +34,11 @@ Overlay::Overlay() {
     m_dispDrv.buffer = &m_dispBufferInfo;
     m_dispDrv.flush_cb = flushBuffer;
     lv_disp_drv_register(&m_dispDrv);
+
+    lv_indev_drv_init(&m_keyDrv);
+    m_keyDrv.type = LV_INDEV_TYPE_KEYPAD;
+    m_keyDrv.read_cb = keysRead;
+    mp_keyIn = lv_indev_drv_register(&m_keyDrv);
 
     lv_indev_drv_init(&m_touchDrv);
     m_touchDrv.type = LV_INDEV_TYPE_POINTER;
@@ -110,17 +115,50 @@ void Overlay::flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_col
 
 bool Overlay::touchRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
     /*Save the state and save the pressed coordinate*/
-    hidScanInput();
     data->state = hidTouchCount() > 0 ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
     if (data->state == LV_INDEV_STATE_PR) {
         touchPosition touch;
         hidTouchRead(&touch, 0);
         data->point.x = touch.px * SCREEN_WIDTH / SCREEN_WIDTH_HANDHELD - OVERLAY_POS_X;
         data->point.y = touch.py * SCREEN_HEIGHT / SCREEN_HEIGHT_HANDHELD - OVERLAY_POS_Y;
-    } else {
-        data->point.x = 0;
-        data->point.y = 0;
     }
 
     return false; /*Return `false` because we are not buffering and no more data to read*/
+}
+
+bool Overlay::keysRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
+    u64 keysDown = hidKeysHeld(CONTROLLER_P1_AUTO);
+    data->state = keysDown ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+    if (data->state == LV_INDEV_STATE_PR) {
+        if (keysDown & KEY_UP)
+            data->key = LV_KEY_UP;
+        else if (keysDown & KEY_DOWN)
+            data->key = LV_KEY_DOWN;
+        else if (keysDown & KEY_RIGHT)
+            data->key = LV_KEY_RIGHT;
+        else if (keysDown & KEY_LEFT)
+            data->key = LV_KEY_LEFT;
+        else if (keysDown & KEY_A)
+            data->key = LV_KEY_ENTER;
+        else if (keysDown & KEY_B)
+            data->key = LV_KEY_ESC;
+        else if (keysDown & KEY_L)
+            data->key = LV_KEY_PREV;
+        else if (keysDown & KEY_R)
+            data->key = LV_KEY_NEXT;
+    }
+    //     LV_KEY_UP = 17,       /*0x11*/
+    //     LV_KEY_DOWN = 18,     /*0x12*/
+    //     LV_KEY_RIGHT = 19,    /*0x13*/
+    //     LV_KEY_LEFT = 20,     /*0x14*/
+    //     LV_KEY_ESC = 27,      /*0x1B*/
+    //     LV_KEY_DEL = 127,     /*0x7F*/
+    //     LV_KEY_BACKSPACE = 8, /*0x08*/
+    //     LV_KEY_ENTER = 10,    /*0x0A, '\n'*/
+    //     LV_KEY_NEXT = 9,      /*0x09, '\t'*/
+    //     LV_KEY_PREV = 11,     /*0x0B, '*/
+    //     LV_KEY_HOME = 2,      /*0x02, STX*/
+    //     LV_KEY_END = 3,       /*0x03, ETX*/
+
+    return false;
 }

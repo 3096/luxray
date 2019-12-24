@@ -31,11 +31,15 @@ class Overlay {
     lv_disp_buf_t m_dispBufferInfo;
     lv_color_t mp_renderBuf[OVERLAY_BUF_LENGTH];
     void* mp_frameBuffers[2];
+
     lv_indev_drv_t m_touchDrv;
+    lv_indev_drv_t m_keyDrv;
 
     inline Framebuffer* getFbInfo_();
 
    public:
+    lv_indev_t* mp_keyIn;
+
     Overlay();
     ~Overlay();
 
@@ -51,4 +55,5 @@ class Overlay {
 
     static void flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvBuffer);
     static bool touchRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
+    static bool keysRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
 };
