@@ -43,7 +43,28 @@ Overlay::Overlay() {
     m_touchDrv.read_cb = touchRead;
     lv_indev_drv_register(&m_touchDrv);
 
-    lv_theme_set_current(lv_theme_material_init(210, NULL));
+    // Theme style (temp)
+    // TODO: refactor this
+    mp_theme = lv_theme_material_init(200, nullptr);
+    mp_theme->style.scr->body.main_color = {0, 0, 0, 0x7F};
+    mp_theme->style.scr->body.grad_color = {0, 0, 0, 0x7F};
+    mp_theme->style.scr->text.color = LV_COLOR_WHITE;
+    mp_theme->style.scr->text.font = &lv_font_roboto_22;
+
+    mp_theme->style.win.header->body.main_color = lv_color_hex(0x1976D2);
+    mp_theme->style.win.header->body.grad_color = lv_color_hex(0x1976D2);
+    mp_theme->style.win.header->text.color = LV_COLOR_WHITE;
+    mp_theme->style.win.header->text.font = &lv_font_roboto_22;
+    mp_theme->style.win.bg = &lv_style_transp;
+
+    mp_theme->style.btnm.bg->body.main_color = lv_color_hex(0x263238);
+    mp_theme->style.btnm.bg->body.grad_color = lv_color_hex(0x263238);
+    mp_theme->style.btnm.bg->body.border.color = lv_color_hex(0x707070);
+    mp_theme->style.btnm.bg->body.shadow.color = lv_color_hex(0x707070);
+    mp_theme->style.btnm.btn.rel->text.color = LV_COLOR_WHITE;
+    mp_theme->style.btnm.btn.rel->body.border.color = lv_color_hex(0x707070);
+
+    lv_theme_set_current(mp_theme);
 
     LOG("lv initialized");
 
@@ -79,9 +100,7 @@ Overlay::~Overlay() {
     viExit();
 }
 
-void Overlay::run() {
-    mp_mainScreen->show();
-}
+void Overlay::run() { mp_mainScreen->show(); }
 
 Framebuffer* Overlay::getFbInfo_() { return &m_frameBufferInfo; }
 

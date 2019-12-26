@@ -13,6 +13,7 @@
 
 extern "C" {
 u32 __nx_applet_type = AppletType_None;
+TimeServiceType __nx_time_service_type = TimeServiceType_System;
 
 #define INNER_HEAP_SIZE 0x1000000  // temp for testing
 char nx_inner_heap[INNER_HEAP_SIZE];

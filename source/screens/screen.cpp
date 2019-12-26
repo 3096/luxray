@@ -4,8 +4,6 @@ Screen::Screen(lv_obj_t* prevScreen) : mp_prevScreen(prevScreen) { mp_thisScreen
 
 Screen::~Screen() { lv_obj_del(mp_thisScreen); }
 
-lv_obj_t* Screen::getScreenObj() { return mp_thisScreen; }
-
 void Screen::show() {
     lv_scr_load(mp_thisScreen);
     while (true) {

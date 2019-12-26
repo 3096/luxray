@@ -35,6 +35,8 @@ class Overlay {
     lv_indev_drv_t m_touchDrv;
     lv_indev_drv_t m_keyDrv;
 
+    lv_theme_t* mp_theme;
+
     std::unique_ptr<MainScreen> mp_mainScreen;
 
     inline Framebuffer* getFbInfo_();
