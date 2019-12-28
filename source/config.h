@@ -6,7 +6,7 @@
 // aligned to 128
 #define OVERLAY_HEIGHT_BASE     384
 
-#define OVERLAY_DPI_BASE        96
+#define OVERLAY_DPI_BASE        100
 
 /* - 1:  smaller overlay, saves RAM
  * - 2:  bigger overlay, more readable on handheld

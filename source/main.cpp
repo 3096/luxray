@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
     LOG("Main start");
 
     gp_overlay->run();
-    
+
     LOG("Main exit");
     __appExit();
     return 0;

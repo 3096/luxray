@@ -1,16 +1,21 @@
 #pragma once
 
-#include <switch.h>
-#include <cstdio>
-#include <string>
-
-#include "util.hpp"
-
 #define DEBUG
+
+#ifdef DEBUG
+#    define ATMOSPHERE_BOARD_NINTENDO_SWITCH
+
+#    include <switch.h>
+#    include <cstdio>
+#    include <stratosphere/ams/ams_environment.hpp>
+#    include <stratosphere/ncm/ncm_types.hpp>
+#    include <string>
+
+#    include "util.hpp"
+#    include "lvgl/lvgl.h"
 
 extern FILE* g_debug_file;
 
-#ifdef DEBUG
 // vscode INTELLISENSE doesn't work with __VA_OPT__ apparently
 #    ifndef __INTELLISENSE__
 #        define LOG(fmt, ...)                                                                       \

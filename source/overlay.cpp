@@ -4,6 +4,9 @@ extern "C" u64 __nx_vi_layer_id;
 
 extern Overlay* gp_overlay;
 
+lv_indev_t* gp_keyIn;
+lv_indev_t* gp_touchIn;
+
 Overlay::Overlay() {
     TRY_GOTO(viInitialize(ViServiceType_Manager), end);
     TRY_GOTO(viOpenDefaultDisplay(&m_viDisplay), close_serv);
@@ -33,15 +36,15 @@ Overlay::Overlay() {
     m_dispDrv.flush_cb = flushBuffer;
     lv_disp_drv_register(&m_dispDrv);
 
-    lv_indev_drv_init(&m_keyDrv);
-    m_keyDrv.type = LV_INDEV_TYPE_KEYPAD;
-    m_keyDrv.read_cb = keysRead;
-    mp_keyIn = lv_indev_drv_register(&m_keyDrv);
-
     lv_indev_drv_init(&m_touchDrv);
     m_touchDrv.type = LV_INDEV_TYPE_POINTER;
     m_touchDrv.read_cb = touchRead;
-    lv_indev_drv_register(&m_touchDrv);
+    gp_touchIn = lv_indev_drv_register(&m_touchDrv);
+
+    lv_indev_drv_init(&m_keyDrv);
+    m_keyDrv.type = LV_INDEV_TYPE_KEYPAD;
+    m_keyDrv.read_cb = keysRead;
+    gp_keyIn = lv_indev_drv_register(&m_keyDrv);
 
     // Theme style (temp)
     // TODO: refactor this
@@ -155,15 +158,15 @@ bool Overlay::touchRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
 
 bool Overlay::keysRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
     u64 keysDown = hidKeysHeld(CONTROLLER_P1_AUTO);
-    data->state = keysDown ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
-    if (data->state == LV_INDEV_STATE_PR) {
-        if (keysDown & KEY_UP)
+    if (keysDown) {
+        data->state = LV_INDEV_STATE_PR;
+        if (keysDown & KEY_DUP)
             data->key = LV_KEY_UP;
-        else if (keysDown & KEY_DOWN)
+        else if (keysDown & KEY_DDOWN)
             data->key = LV_KEY_DOWN;
-        else if (keysDown & KEY_RIGHT)
+        else if (keysDown & KEY_DRIGHT)
             data->key = LV_KEY_RIGHT;
-        else if (keysDown & KEY_LEFT)
+        else if (keysDown & KEY_DLEFT)
             data->key = LV_KEY_LEFT;
         else if (keysDown & KEY_A)
             data->key = LV_KEY_ENTER;
@@ -173,7 +176,12 @@ bool Overlay::keysRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
             data->key = LV_KEY_PREV;
         else if (keysDown & KEY_R)
             data->key = LV_KEY_NEXT;
+        else
+            data->state = LV_INDEV_STATE_REL;
+    } else {
+        data->state = LV_INDEV_STATE_REL;
     }
+
     //     LV_KEY_UP = 17,       /*0x11*/
     //     LV_KEY_DOWN = 18,     /*0x12*/
     //     LV_KEY_RIGHT = 19,    /*0x13*/

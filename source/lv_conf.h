@@ -48,7 +48,7 @@
 #define LV_INDEXED_CHROMA    1
 
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
-#define LV_ANTIALIAS        0
+#define LV_ANTIALIAS        1
 
 /* Default display refresh period.
  * Can be changed in the display driver (`lv_disp_drv_t`).*/
@@ -225,7 +225,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  *===============*/
 
 /*1: Enable the log module*/
-#define LV_USE_LOG      0
+#define LV_USE_LOG      1
 #if LV_USE_LOG
 /* How important log should be added:
  * LV_LOG_LEVEL_TRACE       A lot of logs to give detailed information
@@ -585,7 +585,7 @@ typedef void * lv_obj_user_data_t;
 /*--END OF LV_CONF_H--*/
 
 /*Be sure every define has a default value*/
-#include "lvgl/src/lv_conf_checker.h"
+// #include "lvgl/src/lv_conf_checker.h"
 
 #endif /*LV_CONF_H*/
 
