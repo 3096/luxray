@@ -26,6 +26,7 @@ void __appExit(void);
 }
 
 Overlay* gp_overlay;
+TimeScreen* gp_timeScreen;
 
 void __libnx_initheap(void) {
     extern char* fake_heap_start;
@@ -70,7 +71,11 @@ void __appExit(void) {
 int main(int argc, char* argv[]) {
     LOG("Main start");
 
-    gp_overlay->run();
+    try {
+        gp_overlay->run();
+    } catch (std::runtime_error& e) {
+        LOG("runtime_error: %s", e.what());
+    }
 
     LOG("Main exit");
     __appExit();

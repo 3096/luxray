@@ -1,6 +1,7 @@
 #pragma once
 
 #include <switch.h>
+#include "../debug.hpp"
 #include "../lvgl/lvgl.h"
 
 class Screen {
@@ -9,11 +10,11 @@ class Screen {
 
    protected:
     lv_obj_t* mp_thisScreen;
-    virtual bool procFrame();
+    virtual bool procFrame_();
 
    public:
     Screen(lv_obj_t* prevScreen);
-    ~Screen();
+    virtual ~Screen();
 
     void show();
 };

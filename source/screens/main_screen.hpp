@@ -7,9 +7,7 @@
 
 class MainScreen : public Screen {
    private:
-    std::unique_ptr<TimeScreen> mp_timeScreen;
-
-    virtual bool procFrame();
+    virtual bool procFrame_();
 
    public:
     MainScreen(lv_obj_t* prevScreen);

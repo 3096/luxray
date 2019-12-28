@@ -1,7 +1,9 @@
 #include "main_screen.hpp"
 
+extern TimeScreen* gp_timeScreen;
+
 MainScreen::MainScreen(lv_obj_t* prevScreen) : Screen(prevScreen) {
-    mp_timeScreen = std::make_unique<TimeScreen>(mp_thisScreen);
+    gp_timeScreen = new TimeScreen(mp_thisScreen);
 
     // temp for testing
     lv_obj_t* titleLabel = lv_label_create(mp_thisScreen, NULL);
@@ -9,13 +11,15 @@ MainScreen::MainScreen(lv_obj_t* prevScreen) : Screen(prevScreen) {
     lv_obj_align(titleLabel, NULL, LV_ALIGN_CENTER, 0, 0);
 }
 
-MainScreen::~MainScreen() {}
+MainScreen::~MainScreen() {
+    delete gp_timeScreen;
+}
 
-bool MainScreen::procFrame() {
+bool MainScreen::procFrame_() {
     // temp for testing
     if (hidKeysDown(CONTROLLER_P1_AUTO) & KEY_A) {
-        mp_timeScreen->show();
+        gp_timeScreen->show();
     }
-    Screen::procFrame();
+    Screen::procFrame_();
     return true; // TODO: MainScreen may exit another way
 }

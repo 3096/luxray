@@ -7,14 +7,14 @@ Screen::~Screen() { lv_obj_del(mp_thisScreen); }
 void Screen::show() {
     lv_scr_load(mp_thisScreen);
     while (true) {
-        if (!procFrame()) {
+        if (not procFrame_()) {
             break;
         }
     }
     if (mp_prevScreen) lv_scr_load(mp_prevScreen);
 }
 
-bool Screen::procFrame() {
+bool Screen::procFrame_() {
     hidScanInput();
     u64 keysDown = hidKeysDown(CONTROLLER_P1_AUTO);
     lv_task_handler();

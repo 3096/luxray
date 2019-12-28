@@ -75,6 +75,7 @@ Overlay::Overlay() {
 
     LOG("screens initialized");
 
+    m_doRender = true;
     return;
 
 #if USE_LINEAR_BUF
@@ -113,6 +114,9 @@ void Overlay::copyPrivFb() {
 }
 
 void Overlay::flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvColor) {
+    if (not gp_overlay->m_doRender) {
+        return;
+    }
     Framebuffer* p_fbInfo = gp_overlay->getFbInfo_();
     lv_color_t* p_frameBuf = (lv_color_t*)framebufferBegin(p_fbInfo, nullptr);
 

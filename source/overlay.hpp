@@ -35,6 +35,7 @@ class Overlay {
     lv_disp_buf_t m_dispBufferInfo;
     lv_color_t mp_renderBuf[OVERLAY_BUF_LENGTH];
     void* mp_frameBuffers[2];
+    bool m_doRender;
 
     lv_indev_drv_t m_touchDrv;
     lv_indev_drv_t m_keyDrv;
@@ -50,6 +51,8 @@ class Overlay {
     ~Overlay();
 
     void run();
+    inline void pauseRendering() { m_doRender = false; }
+    inline void resumeRendering() { m_doRender = true; }
 
     inline void copyPrivFb();
 
