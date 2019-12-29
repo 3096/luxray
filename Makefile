@@ -37,12 +37,22 @@ include $(DEVKITPRO)/libnx/switch_rules
 #   of a homebrew executable (.nro). This is intended to be used for sysmodules.
 #   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
-TARGET		:=	$(notdir $(CURDIR))
+
+APP_TITLE	:=	Luxray
+APP_AUTHOR	:=	3096
+APP_VERSION	:=	early_test
+
+TARGET		:=	luxray
 BUILD		:=	build
 SOURCES		:=	source source/screens source/lvgl/src/lv_core source/lvgl/src/lv_draw source/lvgl/src/lv_font source/lvgl/src/lv_hal source/lvgl/src/lv_misc source/lvgl/src/lv_objx source/lvgl/src/lv_themes source/core # temporary until I learn a better way to do this...
 DATA		:=	data
 INCLUDES	:=	include
 #ROMFS	:=	romfs
+
+GITREV  := $(shell git rev-parse HEAD)
+ifneq ($(GITREV),)
+APP_VERSION := $(APP_VERSION)-$(GITREV)
+endif
 
 #---------------------------------------------------------------------------------
 # options for code generation

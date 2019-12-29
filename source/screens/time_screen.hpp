@@ -2,21 +2,18 @@
 
 #include <memory>
 
-#include "screen.hpp"
-#include "../debug.hpp"
 #include "../core/time.hpp"
+#include "../debug.hpp"
+#include "screen.hpp"
 
 class TimeScreen : public Screen {
    private:
-    std::unique_ptr<TimeTaskHandler> m_timeTaskHandler;
-
-    lv_obj_t* mp_promptLabel;
-    lv_obj_t* mp_valueLabel;
-
+    // consts
     static constexpr const char* STRING_CUR_DATE = "Current Date:";
     // static constexpr const char* STRING_TARGET_DATE = "Target Date:";
     static constexpr const char* STRING_TARGET_CHANGE = "Target Change:";
     static constexpr const char* STRING_STEPPING = "Step Remaining:";
+    static constexpr const char* STRING_DAYS = " days";
 
     static constexpr const char* BUTTON_MAP_LAYOUT[] = {
         "1", "2", "3", "R/S", "+1", "\n",
@@ -44,13 +41,29 @@ class TimeScreen : public Screen {
         BUTTON_UNDEF_19 = 19
     };
 
-    void handleButtonEventImpl_(Button button);
+    static constexpr int MAX_TARGET_CHANGE = 99999;
+
+    // members
+    std::unique_ptr<TimeTaskHandler> mp_timeTaskHandler;
+
+    lv_obj_t* mp_promptLabel;
+    lv_obj_t* mp_valueLabel;
+
+    bool m_doButtonClick;
+
+    int m_curTargetChange;
+    int8_t m_curTargetSign;
+    std::string m_promptLabelStr;
+    std::string m_valueLabelStr;
+
+    // helpers
+    void handleButtonEventImpl_(lv_obj_t* btnm);
     static void handleButtonEvent_(lv_obj_t* obj, lv_event_t event);
 
+    // poly
     virtual bool procFrame_();
 
    public:
     TimeScreen(lv_obj_t* prevScreen);
     ~TimeScreen();
-
 };

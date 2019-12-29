@@ -3,3 +3,9 @@
 ---
 
 LuxrayVision is an overlay utility for Pokémon in the form of a sysmodule.
+
+---
+
+TODO:
+
+- Test if time sync is needed.

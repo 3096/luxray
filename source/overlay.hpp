@@ -45,6 +45,11 @@ class Overlay {
     std::unique_ptr<MainScreen> mp_mainScreen;
 
     inline Framebuffer* getFbInfo_();
+    inline void copyPrivFb_();
+
+    static void flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvBuffer);
+    static bool touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
+    static bool keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
 
    public:
     Overlay();
@@ -53,10 +58,7 @@ class Overlay {
     void run();
     inline void pauseRendering() { m_doRender = false; }
     inline void resumeRendering() { m_doRender = true; }
-
-    inline void copyPrivFb();
-
-    static void flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvBuffer);
-    static bool touchRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
-    static bool keysRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
+    inline void toggleRendering() { m_doRender = !m_doRender; }
+    inline bool isRendering() { return m_doRender; }
+    void flushEmptyFb();
 };

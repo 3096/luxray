@@ -15,4 +15,5 @@ public:
 
     void handleTask();
     std::string getCurDateStr();
+    void setDayChange(int dayChange);
 };

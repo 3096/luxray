@@ -33,17 +33,17 @@ Overlay::Overlay() {
     lv_disp_drv_init(&m_dispDrv);
     lv_disp_buf_init(&m_dispBufferInfo, mp_renderBuf, nullptr, OVERLAY_BUF_LENGTH);
     m_dispDrv.buffer = &m_dispBufferInfo;
-    m_dispDrv.flush_cb = flushBuffer;
+    m_dispDrv.flush_cb = flushBuffer_;
     lv_disp_drv_register(&m_dispDrv);
 
     lv_indev_drv_init(&m_touchDrv);
     m_touchDrv.type = LV_INDEV_TYPE_POINTER;
-    m_touchDrv.read_cb = touchRead;
+    m_touchDrv.read_cb = touchRead_;
     gp_touchIn = lv_indev_drv_register(&m_touchDrv);
 
     lv_indev_drv_init(&m_keyDrv);
     m_keyDrv.type = LV_INDEV_TYPE_KEYPAD;
-    m_keyDrv.read_cb = keysRead;
+    m_keyDrv.read_cb = keysRead_;
     gp_keyIn = lv_indev_drv_register(&m_keyDrv);
 
     // Theme style (temp)
@@ -108,12 +108,12 @@ void Overlay::run() { mp_mainScreen->show(); }
 
 Framebuffer* Overlay::getFbInfo_() { return &m_frameBufferInfo; }
 
-void Overlay::copyPrivFb() {
+void Overlay::copyPrivFb_() {
     std::memcpy(mp_frameBuffers[m_nWindow.cur_slot], mp_frameBuffers[m_nWindow.cur_slot ^ 1],
                 m_frameBufferInfo.fb_size);
 }
 
-void Overlay::flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvColor) {
+void Overlay::flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvColor) {
     if (not gp_overlay->m_doRender) {
         return;
     }
@@ -127,7 +127,7 @@ void Overlay::flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_col
         p_lvColor += renderWidth;
     }
 #else
-    gp_overlay->copyPrivFb();
+    gp_overlay->copyPrivFb_();
 
     // https://github.com/switchbrew/libnx/blob/v1.6.0/nx/include/switch/display/gfx.h#L106-L119
     for (int y = p_area->y1; y <= p_area->y2; y++) {
@@ -147,7 +147,13 @@ void Overlay::flushBuffer(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_col
     lv_disp_flush_ready(p_disp);
 }
 
-bool Overlay::touchRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
+void Overlay::flushEmptyFb() {
+    void* p_frameBuf = framebufferBegin(&m_frameBufferInfo, nullptr);
+    std::memset(p_frameBuf, 0, m_frameBufferInfo.fb_size);
+    framebufferEnd(&m_frameBufferInfo);
+}
+
+bool Overlay::touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
     /*Save the state and save the pressed coordinate*/
     data->state = hidTouchCount() > 0 ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
     if (data->state == LV_INDEV_STATE_PR) {
@@ -160,10 +166,11 @@ bool Overlay::touchRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
     return false; /*Return `false` because we are not buffering and no more data to read*/
 }
 
-bool Overlay::keysRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
+bool Overlay::keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
     u64 keysDown = hidKeysHeld(CONTROLLER_P1_AUTO);
     if (keysDown) {
         data->state = LV_INDEV_STATE_PR;
+        // TODO: refactor this to a button map
         if (keysDown & KEY_DUP)
             data->key = LV_KEY_UP;
         else if (keysDown & KEY_DDOWN)
@@ -172,14 +179,10 @@ bool Overlay::keysRead(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
             data->key = LV_KEY_RIGHT;
         else if (keysDown & KEY_DLEFT)
             data->key = LV_KEY_LEFT;
-        else if (keysDown & KEY_A)
-            data->key = LV_KEY_ENTER;
-        else if (keysDown & KEY_B)
-            data->key = LV_KEY_ESC;
         else if (keysDown & KEY_L)
-            data->key = LV_KEY_PREV;
+            data->key = LV_KEY_ESC;
         else if (keysDown & KEY_R)
-            data->key = LV_KEY_NEXT;
+            data->key = LV_KEY_ENTER;
         else
             data->state = LV_INDEV_STATE_REL;
     } else {
