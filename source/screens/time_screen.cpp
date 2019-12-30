@@ -18,9 +18,12 @@ static void style_mod(lv_group_t* group, lv_style_t* style) {
 }
 
 TimeScreen::TimeScreen(lv_obj_t* prevScreen)
-    : Screen(prevScreen), m_doButtonClick(false), m_curTargetChange(0), m_curTargetSign(1) {
-    mp_timeTaskHandler = std::make_unique<TimeTaskHandler>();
-
+    : Screen(prevScreen),
+      mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
+      m_doButtonClick(false),
+      m_isInStepDays(false),
+      m_curTargetChange(0),
+      m_curTargetSign(1) {
     lv_obj_t* p_window = lv_win_create(mp_thisScreen, nullptr);
     lv_win_set_title(p_window, "  Date Advance");
 
@@ -45,20 +48,32 @@ TimeScreen::TimeScreen(lv_obj_t* prevScreen)
 TimeScreen::~TimeScreen() {}
 
 bool TimeScreen::procFrame_() {
-    // TODO
     gp_overlay->pauseRendering();  // lv tries to draw text before it knows where, smh
 
     mp_timeTaskHandler->handleTask();
 
-    // prompt label
+    // generate label strings
     m_promptLabelStr = STRING_CUR_DATE;
     m_promptLabelStr += "\n";
-    m_promptLabelStr += STRING_TARGET_CHANGE;  // temp
-    lv_label_set_text(mp_promptLabel, m_promptLabelStr.c_str());
+    m_valueLabelStr = mp_timeTaskHandler->getCurDateStr() + "\n";
 
-    // value label
-    m_valueLabelStr = mp_timeTaskHandler->getCurDateStr() + "\n" +
-                      std::to_string(m_curTargetSign * m_curTargetChange) + STRING_DAYS;  // temp
+    if (m_isInStepDays) {        
+        int daysValue = mp_timeTaskHandler->daysLeftToStep();
+        if (not (daysValue > 0)) {
+            handleStepDaysEnd_();
+        }
+
+        m_promptLabelStr += STRING_STEPPING;
+        m_valueLabelStr += std::to_string(daysValue);
+    } else {
+        m_promptLabelStr += STRING_TARGET_CHANGE;
+        m_valueLabelStr += std::to_string(m_curTargetSign * m_curTargetChange);
+    }
+
+    m_valueLabelStr += STRING_DAYS;
+
+    // render new text
+    lv_label_set_text(mp_promptLabel, m_promptLabelStr.c_str());
     lv_label_set_text(mp_valueLabel, m_valueLabelStr.c_str());
     lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -18, 18);
     gp_overlay->resumeRendering();
@@ -71,24 +86,20 @@ void TimeScreen::handleButtonEventImpl_(lv_obj_t* btnm) {
         m_doButtonClick = true;
         return;
     }
+
     Button button = (Button)lv_btnm_get_active_btn(btnm);
-    // TODO
     switch (button) {
         case BUTTON_RESET:
             // TODO
             return;
         case BUTTON_PLUS_ONE:
-            // TODO
-            return;
+            return mp_timeTaskHandler->setDayChange(1);
         case BUTTON_SET:
-            mp_timeTaskHandler->setDayChange(m_curTargetSign * m_curTargetChange);
-            return;
+            return mp_timeTaskHandler->setDayChange(m_curTargetSign * m_curTargetChange);
         case BUTTON_PLUS_THREE:
-            // TODO
-            return;
+            return handleStepDaysStart_(1, 3);
         case BUTTON_STEP:
-            // TODO
-            return;
+            return handleStepDaysStart_(m_curTargetSign, m_curTargetChange);
         case BUTTON_NEGATIVE:
             m_curTargetSign *= -1;
             return;
@@ -96,7 +107,7 @@ void TimeScreen::handleButtonEventImpl_(lv_obj_t* btnm) {
             m_curTargetChange /= 10;
             return;
         case BUTTON_NTP:
-            // TODO
+            // mp_timeTaskHandler->setTimeNTP(); // disabled cuz ram issue for now
             return;
         case BUTTON_UNDEF_14:
         case BUTTON_UNDEF_19:
@@ -115,3 +126,11 @@ void TimeScreen::handleButtonEvent_(lv_obj_t* btnm, lv_event_t event) {
         gp_timeScreen->handleButtonEventImpl_(btnm);
     }
 }
+
+void TimeScreen::handleStepDaysStart_(int8_t stepDirection, int daysToStep) {
+    m_isInStepDays = true;
+    // TODO: disable ui elements
+    mp_timeTaskHandler->startStepDaysTask(stepDirection, daysToStep);
+}
+
+void TimeScreen::handleStepDaysEnd_() { m_isInStepDays = false; }

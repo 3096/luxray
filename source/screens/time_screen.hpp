@@ -45,11 +45,11 @@ class TimeScreen : public Screen {
 
     // members
     std::unique_ptr<TimeTaskHandler> mp_timeTaskHandler;
-
     lv_obj_t* mp_promptLabel;
     lv_obj_t* mp_valueLabel;
 
     bool m_doButtonClick;
+    bool m_isInStepDays;
 
     int m_curTargetChange;
     int8_t m_curTargetSign;
@@ -59,6 +59,8 @@ class TimeScreen : public Screen {
     // helpers
     void handleButtonEventImpl_(lv_obj_t* btnm);
     static void handleButtonEvent_(lv_obj_t* obj, lv_event_t event);
+    void handleStepDaysStart_(int8_t stepDirection, int daysToStep);
+    void handleStepDaysEnd_();
 
     // poly
     virtual bool procFrame_();

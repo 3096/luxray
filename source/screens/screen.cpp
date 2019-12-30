@@ -3,9 +3,11 @@
 
 extern Overlay* gp_overlay;
 
-Screen::Screen(lv_obj_t* prevScreen) : mp_prevScreen(prevScreen), m_ScreenIsJustToggled(false), m_screenIsOn(true) {
-    mp_thisScreen = lv_obj_create(nullptr, nullptr);
-}
+Screen::Screen(lv_obj_t* prevScreen)
+    : mp_prevScreen(prevScreen),
+      m_ScreenIsJustToggled(false),
+      mp_thisScreen(lv_obj_create(nullptr, nullptr)),
+      m_screenIsOn(true) {}
 
 Screen::~Screen() { lv_obj_del(mp_thisScreen); }
 
