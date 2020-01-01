@@ -41,7 +41,7 @@ void __appInit(void) {
     TRY(hidInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_HID)));
     TRY(fsInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_FS)));
     TRY(timeInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_Time)));
-    // __libnx_init_time();
+    TRY(nifmInitialize(NifmServiceType_User), fatalThrow(rc));
 
     fsdevMountSdmc();
     debugInit();
@@ -63,6 +63,7 @@ void __appExit(void) {
     debugExit();
     fsdevUnmountAll();
     fsExit();
+    nifmExit();
     timeExit();
     hidExit();
     smExit();

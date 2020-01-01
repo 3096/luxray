@@ -6,9 +6,8 @@
 #include "../debug.hpp"
 #include "ntp.hpp"
 
-class TimeTaskHandler
-{
-private:
+class TimeTaskHandler {
+   private:
     static constexpr float STEP_INTERVAL = 0.5;
     const u64 STEP_TICK_INTERVAL;
 
@@ -20,7 +19,7 @@ private:
 
     void setTime_(time_t time);
 
-public:
+   public:
     TimeTaskHandler();
     ~TimeTaskHandler();
 
@@ -28,7 +27,7 @@ public:
 
     void startStepDaysTask(int8_t sign, int daysToStep);
     int daysLeftToStep();
-    
+
     std::string getCurDateStr();
     void setDayChange(int dayChange);
     void setTimeNTP();

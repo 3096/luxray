@@ -27,9 +27,10 @@ void TimeTaskHandler::handleTask() {
 void TimeTaskHandler::startStepDaysTask(int8_t stepDirection, int daysToStep) {
     m_curStepDirection = stepDirection;
     m_curDaysLeftToStep = daysToStep;
+    m_lastStepInterval = armGetSystemTick() / STEP_TICK_INTERVAL;
 }
 
-int TimeTaskHandler::daysLeftToStep() { return m_curStepDirection * m_curDaysLeftToStep; }
+int TimeTaskHandler::daysLeftToStep() { return m_curDaysLeftToStep; }
 
 std::string TimeTaskHandler::getCurDateStr() {
     struct tm* p_tm = localtime(&m_curTime);
@@ -46,10 +47,6 @@ void TimeTaskHandler::setTime_(time_t time) {
     }
 }
 
-void TimeTaskHandler::setDayChange(int dayChange) {
-    setTime_(m_curTime + dayChange * 60 * 60 * 24);
-}
+void TimeTaskHandler::setDayChange(int dayChange) { setTime_(m_curTime + dayChange * 60 * 60 * 24); }
 
-void TimeTaskHandler::setTimeNTP() {
-    setTime_(ntpGetTime());
-}
+void TimeTaskHandler::setTimeNTP() { setTime_(ntpGetTime()); }

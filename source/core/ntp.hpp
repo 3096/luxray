@@ -26,7 +26,7 @@ For more information, please refer to <https://unlicense.org>
 Additionally, the ntp_packet struct uses code licensed under the BSD 3-clause. See LICENSE-THIRD-PARTY for more
 information. */
 
-#define _BSD_SOURCE
+#pragma once
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -40,8 +40,8 @@ information. */
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 #include <switch.h>
 
