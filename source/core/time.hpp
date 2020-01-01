@@ -12,10 +12,11 @@ class TimeTaskHandler {
     const u64 STEP_TICK_INTERVAL;
 
     time_t m_curTime;
+    time_t m_curTimeChange;
 
     int m_curDaysLeftToStep;
     int m_curStepDirection;
-    u64 m_lastStepInterval;
+    u64 m_lastStepIntervalNum;
 
     void setTime_(time_t time);
 
@@ -32,4 +33,5 @@ class TimeTaskHandler {
     std::string getCurDateStr();
     void setDayChange(int dayChange);
     void setTimeNTP();
+    void resetTime();
 };

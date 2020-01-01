@@ -38,7 +38,6 @@ TimeScreen::TimeScreen(lv_obj_t* prevScreen)
     mp_buttonMatrix = lv_btnm_create(p_window, NULL);
     lv_btnm_set_map(mp_buttonMatrix, (const char**)BUTTON_MAP_LAYOUT);
     lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNM_CTRL_TGL_ENABLE);
-    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_STEP, LV_BTNM_CTRL_TGL_ENABLE);
     lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_INACTIVE);
     lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
     lv_obj_set_event_cb(mp_buttonMatrix, handleButtonEvent_);
@@ -104,18 +103,29 @@ void TimeScreen::handleButtonEventImpl_() {
     Button button = (Button)lv_btnm_get_active_btn(mp_buttonMatrix);
     switch (button) {
         case BUTTON_RESET:
-            // TODO
+            mp_timeTaskHandler->resetTime();
+            m_curTargetChange = 0;
+            if (m_curTargetSign != 1) {
+                m_curTargetSign = 1;
+                lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNM_CTRL_TGL_STATE);
+            }
             return;
         case BUTTON_PLUS_ONE:
             mp_timeTaskHandler->setDayChange(1);
             break;
         case BUTTON_SET:
+            if (m_curTargetChange == 0) {
+                return;
+            }
             mp_timeTaskHandler->setDayChange(m_curTargetSign * m_curTargetChange);
             break;
         case BUTTON_PLUS_THREE:
             handleStepDaysStart_(1, 3);
             break;
         case BUTTON_STEP:
+            if (m_curTargetChange == 0) {
+                return;
+            }
             if (not m_isInStepDays) {
                 handleStepDaysStart_(m_curTargetSign, m_curTargetChange);
             } else {
@@ -160,9 +170,13 @@ void TimeScreen::handleButtonEvent_(lv_obj_t* btnm, lv_event_t event) {
 }
 
 void TimeScreen::handleStepDaysStart_(int8_t stepDirection, int daysToStep) {
-    m_isInStepDays = true;
-    // TODO: disable ui elements
     mp_timeTaskHandler->startStepDaysTask(stepDirection, daysToStep);
+    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_STEP, LV_BTNM_CTRL_TGL_STATE);
+    // TODO: disable ui elements
+    m_isInStepDays = true;
 }
 
-void TimeScreen::handleStepDaysEnd_() { m_isInStepDays = false; }
+void TimeScreen::handleStepDaysEnd_() {
+    lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_STEP, LV_BTNM_CTRL_TGL_STATE);
+    m_isInStepDays = false;
+}
