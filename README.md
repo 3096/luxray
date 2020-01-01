@@ -10,9 +10,15 @@ Luxray is an overlay utility for Pokémon in the form of a sysmodule.
 
 TODO:
 
-- Test if time sync is needed
-- Time screen UI update when stepping
-- Test best font for use with 4/3x upscale UI (for handheld)
-- Investigate Switch date limit
-- Improve launcher
-- Refactor Makefile
+- 0.1.0
+  - Update styles
+  - Test if time sync is needed (if so, add check)
+  - Time screen UI update when stepping
+  - Test best font for use with 4/3x upscale UI (for handheld)
+  - Investigate Switch date limit
+  - Improve launcher
+
+- somewhere down the line
+  - Add settings page
+  - Refactor style code
+  - Refactor Makefile

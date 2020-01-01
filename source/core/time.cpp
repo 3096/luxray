@@ -30,8 +30,6 @@ void TimeTaskHandler::startStepDaysTask(int8_t stepDirection, int daysToStep) {
     m_lastStepInterval = armGetSystemTick() / STEP_TICK_INTERVAL;
 }
 
-int TimeTaskHandler::daysLeftToStep() { return m_curDaysLeftToStep; }
-
 std::string TimeTaskHandler::getCurDateStr() {
     struct tm* p_tm = localtime(&m_curTime);
     char dateStr[11];

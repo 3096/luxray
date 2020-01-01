@@ -20,7 +20,7 @@ class TimeScreen : public Screen {
         "1", "2", "3", "R/S", "+1", "\n",
         "4", "5", "6", "Set", "+3", "\n",
         "7", "8", "9", "Step", "-1", "\n",
-        "-", "0", "<-", "NTP", "Stop", ""
+        "-", "0", "<-", "NTP", " ", ""
     };
     /*  Button IDs:
         "1"= 0,  "2"= 1,  "3"= 2,   "R/S"= 3,   "+1"= 4,
@@ -39,7 +39,7 @@ class TimeScreen : public Screen {
         BUTTON_NEGATIVE = 15,
         BUTTON_BACKSPACE = 17,
         BUTTON_NTP = 18,
-        BUTTON_STOP = 19  // TODO: make step button do stop task
+        BUTTON_UNUSED = 19  // TODO: make step button do stop task
     };
 
     static constexpr int MAX_TARGET_CHANGE = 99999;
@@ -51,6 +51,7 @@ class TimeScreen : public Screen {
     lv_obj_t* mp_buttonMatrix;
 
     bool m_doButtonClick;
+    bool m_doNTP;
     bool m_isInStepDays;
     bool m_internetIsConnected;
 

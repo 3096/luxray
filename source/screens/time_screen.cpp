@@ -21,6 +21,7 @@ TimeScreen::TimeScreen(lv_obj_t* prevScreen)
     : Screen(prevScreen),
       mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
       m_doButtonClick(false),
+      m_doNTP(true),
       m_isInStepDays(false),
       m_internetIsConnected(false),
       m_curTargetChange(0),
@@ -37,6 +38,7 @@ TimeScreen::TimeScreen(lv_obj_t* prevScreen)
     mp_buttonMatrix = lv_btnm_create(p_window, NULL);
     lv_btnm_set_map(mp_buttonMatrix, (const char**)BUTTON_MAP_LAYOUT);
     lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNM_CTRL_TGL_ENABLE);
+    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_STEP, LV_BTNM_CTRL_TGL_ENABLE);
     lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_INACTIVE);
     lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
     lv_obj_set_event_cb(mp_buttonMatrix, handleButtonEvent_);
@@ -105,13 +107,22 @@ void TimeScreen::handleButtonEventImpl_() {
             // TODO
             return;
         case BUTTON_PLUS_ONE:
-            return mp_timeTaskHandler->setDayChange(1);
+            mp_timeTaskHandler->setDayChange(1);
+            break;
         case BUTTON_SET:
-            return mp_timeTaskHandler->setDayChange(m_curTargetSign * m_curTargetChange);
+            mp_timeTaskHandler->setDayChange(m_curTargetSign * m_curTargetChange);
+            break;
         case BUTTON_PLUS_THREE:
-            return handleStepDaysStart_(1, 3);
+            handleStepDaysStart_(1, 3);
+            break;
         case BUTTON_STEP:
-            return handleStepDaysStart_(m_curTargetSign, m_curTargetChange);
+            if (not m_isInStepDays) {
+                handleStepDaysStart_(m_curTargetSign, m_curTargetChange);
+            } else {
+                mp_timeTaskHandler->stopStepDaysTask();
+                handleStepDaysEnd_();
+            }
+            break;
         case BUTTON_NEGATIVE:
             m_curTargetSign *= -1;
             return;
@@ -119,21 +130,27 @@ void TimeScreen::handleButtonEventImpl_() {
             m_curTargetChange /= 10;
             return;
         case BUTTON_NTP:
-            if (m_internetIsConnected) {
+            if (m_internetIsConnected and m_doNTP) {
                 mp_timeTaskHandler->setTimeNTP();
+                lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_TGL_STATE);
+                m_doNTP = false;
             }
             return;
         case BUTTON_MINUS_ONE:
-            return mp_timeTaskHandler->setDayChange(-1);
-        case BUTTON_STOP:
-            return handleStepDaysStart_(1, 0);
-        default:
-            // can only be a number button
+            mp_timeTaskHandler->setDayChange(-1);
+            break;
+        case BUTTON_UNUSED:
+            return;
+        default:  // number button
             m_curTargetChange = m_curTargetChange * 10 + (lv_btnm_get_active_btn_text(mp_buttonMatrix)[0] - '0');
             if (m_curTargetChange > MAX_TARGET_CHANGE) {
                 m_curTargetChange = MAX_TARGET_CHANGE;
             }
+            return;
     }
+    // time is changed
+    lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_TGL_STATE);
+    m_doNTP = true;
 }
 
 void TimeScreen::handleButtonEvent_(lv_obj_t* btnm, lv_event_t event) {

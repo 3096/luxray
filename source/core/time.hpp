@@ -26,7 +26,8 @@ class TimeTaskHandler {
     void handleTask();
 
     void startStepDaysTask(int8_t sign, int daysToStep);
-    int daysLeftToStep();
+    inline void stopStepDaysTask() { m_curDaysLeftToStep = 0; }
+    inline int daysLeftToStep() { return m_curDaysLeftToStep; }
 
     std::string getCurDateStr();
     void setDayChange(int dayChange);
