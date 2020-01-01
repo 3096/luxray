@@ -1,8 +1,5 @@
 #pragma once
 
-#include <switch.h>
-
-#include "../debug.hpp"
 #include "../lvgl/lvgl.h"
 
 class Screen {
@@ -15,8 +12,8 @@ class Screen {
     lv_obj_t* mp_thisScreen;
     bool m_screenIsOn;
 
-    u64 m_keysDown;
-    u64 m_keysHeld;
+    uint64_t m_keysDown;
+    uint64_t m_keysHeld;
 
     virtual bool procFrame_();
 

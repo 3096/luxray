@@ -1,15 +1,11 @@
 #pragma once
 
-#include <switch.h>
-#include <cstring>
 #include <memory>
-#include <stdexcept>
+
+#include <switch.h>
 
 #include "config.h"
-#include "debug.hpp"
-#include "lvgl/lvgl.h"
 #include "screens/main_screen.hpp"
-#include "util.hpp"
 
 extern lv_indev_t* gp_keyIn;
 extern lv_indev_t* gp_touchIn;

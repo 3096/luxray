@@ -6,10 +6,10 @@
 #include <switch.h>
 
 #include "debug.hpp"
-#include "overlay.hpp"
-#include "util.hpp"
-
 #include "lvgl/lvgl.h"
+#include "overlay.hpp"
+#include "screens/time_screen.hpp"
+#include "util.hpp"
 
 extern "C" {
 u32 __nx_applet_type = AppletType_None;

@@ -1,5 +1,8 @@
-#include "screen.hpp"
+#include <switch.h>
+
 #include "../overlay.hpp"
+
+#include "screen.hpp"
 
 extern Overlay* gp_overlay;
 

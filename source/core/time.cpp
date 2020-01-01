@@ -1,3 +1,10 @@
+#include <stdexcept>
+
+#include <switch.h>
+
+#include "../debug.hpp"
+#include "ntp.hpp"
+
 #include "time.hpp"
 
 TimeTaskHandler::TimeTaskHandler()

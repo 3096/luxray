@@ -1,3 +1,10 @@
+#include <stdexcept>
+#include <string>
+
+#include <switch.h>
+
+#include "../debug.hpp"
+
 #include "system.hpp"
 
 bool os::nifmInternetIsConnected() {

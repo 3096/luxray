@@ -1,3 +1,9 @@
+#include <cstring>
+#include <stdexcept>
+
+#include "debug.hpp"
+#include "util.hpp"
+
 #include "overlay.hpp"
 
 extern "C" u64 __nx_vi_layer_id;

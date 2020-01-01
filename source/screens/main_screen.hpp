@@ -1,9 +1,6 @@
 #pragma once
 
-#include <memory>
-
 #include "screen.hpp"
-#include "time_screen.hpp"
 
 class MainScreen : public Screen {
    private:

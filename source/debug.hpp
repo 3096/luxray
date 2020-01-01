@@ -1,18 +1,15 @@
 #pragma once
 
-// #define DEBUG
+#define DEBUG
 
 #include <switch.h>
 
 #ifdef DEBUG
 #    define ATMOSPHERE_BOARD_NINTENDO_SWITCH
 
-#    include <cstdio>
 #    include <stratosphere/ams/ams_environment.hpp>
 #    include <stratosphere/ncm/ncm_types.hpp>
-#    include <string>
 
-#    include "lvgl/lvgl.h"
 #    include "util.hpp"
 
 extern FILE* g_debug_file;

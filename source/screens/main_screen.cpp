@@ -1,3 +1,7 @@
+#include <switch.h>
+
+#include "time_screen.hpp"
+
 #include "main_screen.hpp"
 
 extern TimeScreen* gp_timeScreen;

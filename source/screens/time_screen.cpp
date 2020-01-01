@@ -1,5 +1,8 @@
-#include "time_screen.hpp"
+#include "../core/system.hpp"
+#include "../debug.hpp"
 #include "../overlay.hpp"
+
+#include "time_screen.hpp"
 
 extern lv_indev_t* gp_keyIn;
 extern lv_indev_t* gp_touchIn;

@@ -2,9 +2,7 @@
 
 #include <memory>
 
-#include "../core/system.hpp"
 #include "../core/time.hpp"
-#include "../debug.hpp"
 #include "screen.hpp"
 
 class TimeScreen : public Screen {

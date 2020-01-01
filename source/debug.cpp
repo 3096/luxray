@@ -1,6 +1,11 @@
 #include "debug.hpp"
 
 #ifdef DEBUG
+#    include <cstdio>
+#    include <string>
+
+#    include "lvgl/lvgl.h"
+
 namespace ams {
 ncm::ProgramId CurrentProgramId = {0x0100000000000195};
 namespace result {

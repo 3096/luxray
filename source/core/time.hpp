@@ -1,22 +1,20 @@
 #pragma once
 
-#include <switch.h>
-#include <stdexcept>
-
-#include "../debug.hpp"
-#include "ntp.hpp"
+#include <time.h>
+#include <cstdint>
+#include <string>
 
 class TimeTaskHandler {
    private:
     static constexpr float STEP_INTERVAL = 0.5;
-    const u64 STEP_TICK_INTERVAL;
+    const u_int64_t STEP_TICK_INTERVAL;
 
     time_t m_curTime;
     time_t m_curTimeChange;
 
     int m_curDaysLeftToStep;
     int m_curStepDirection;
-    u64 m_lastStepIntervalNum;
+    u_int64_t m_lastStepIntervalNum;
 
     void setTime_(time_t time);
 
