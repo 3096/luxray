@@ -70,8 +70,21 @@ Overlay::Overlay() {
     mp_theme->style.btnm.bg->body.grad_color = lv_color_hex(0x263238);
     mp_theme->style.btnm.bg->body.border.color = lv_color_hex(0x707070);
     mp_theme->style.btnm.bg->body.shadow.color = lv_color_hex(0x707070);
-    mp_theme->style.btnm.btn.rel->text.color = LV_COLOR_WHITE;
     mp_theme->style.btnm.btn.rel->body.border.color = lv_color_hex(0x707070);
+    mp_theme->style.btnm.btn.rel->text.color = LV_COLOR_WHITE;
+    mp_theme->style.btnm.btn.pr->body = mp_theme->style.btnm.btn.rel->body;
+    mp_theme->style.btnm.btn.pr->body.main_color = lv_color_hex(0x607D8B);
+    mp_theme->style.btnm.btn.pr->body.grad_color = lv_color_hex(0x607D8B);
+    mp_theme->style.btnm.btn.pr->body.opa = LV_OPA_100;
+    mp_theme->style.btnm.btn.pr->text.color = LV_COLOR_WHITE;
+    mp_theme->style.btnm.btn.tgl_pr->body = mp_theme->style.btnm.btn.pr->body;
+    mp_theme->style.btnm.btn.tgl_pr->text.color = LV_COLOR_WHITE;
+    mp_theme->style.btnm.btn.tgl_rel->body = mp_theme->style.btnm.btn.pr->body;
+    mp_theme->style.btnm.btn.tgl_rel->body.main_color = lv_color_hex(0x455A64);
+    mp_theme->style.btnm.btn.tgl_rel->body.grad_color = lv_color_hex(0x455A64);
+    mp_theme->style.btnm.btn.tgl_rel->text.color = LV_COLOR_WHITE;
+    mp_theme->style.btnm.btn.ina->body = mp_theme->style.btnm.btn.rel->body;
+    mp_theme->style.btnm.btn.ina->text.color = lv_color_hex(0x424242);
 
     lv_theme_set_current(mp_theme);
 

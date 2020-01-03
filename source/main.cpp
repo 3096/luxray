@@ -21,6 +21,7 @@ char nx_inner_heap[INNER_HEAP_SIZE];
 u32 __nx_nv_transfermem_size = 0x15000;
 
 void __libnx_initheap(void);
+void __libnx_init_time(void);
 void __appInit(void);
 void __appExit(void);
 }
@@ -43,6 +44,7 @@ void __appInit(void) {
     TRY(timeInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_Time)));
     TRY(nifmInitialize(NifmServiceType_User), fatalThrow(rc));
 
+    __libnx_init_time();
     fsdevMountSdmc();
     debugInit();
 

@@ -101,7 +101,6 @@ time_t ntpGetTime() {
     packet.txTm_s = htonl(NTP_TIMESTAMP_DELTA + time(NULL));  // Current networktime on the console
     errno = 0;
     if ((res = send(sockfd, (char*)&packet, sizeof(ntp_packet), 0)) < 0) {
-        LOG64(sizeof(ntp_packet));  // temp
         std::string msg = "Error writing to socket: " + std::to_string(res);
         msg += " errno: " + std::to_string(errno);
         throw std::runtime_error(msg);

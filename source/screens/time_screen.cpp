@@ -104,6 +104,15 @@ void TimeScreen::handleButtonEventImpl_() {
     }
 
     Button button = (Button)lv_btnm_get_active_btn(mp_buttonMatrix);
+
+    if (m_isInStepDays) {  // all other buttons are disabled
+        if (button == BUTTON_STEP) {
+            mp_timeTaskHandler->stopStepDaysTask();
+            handleStepDaysEnd_();
+        }
+        return;
+    }
+
     switch (button) {
         case BUTTON_RESET:
             mp_timeTaskHandler->resetTime();
@@ -129,12 +138,7 @@ void TimeScreen::handleButtonEventImpl_() {
             if (m_curTargetChange == 0) {
                 return;
             }
-            if (not m_isInStepDays) {
-                handleStepDaysStart_(m_curTargetSign, m_curTargetChange);
-            } else {
-                mp_timeTaskHandler->stopStepDaysTask();
-                handleStepDaysEnd_();
-            }
+            handleStepDaysStart_(m_curTargetSign, m_curTargetChange);
             break;
         case BUTTON_NEGATIVE:
             m_curTargetSign *= -1;
@@ -174,12 +178,26 @@ void TimeScreen::handleButtonEvent_(lv_obj_t* btnm, lv_event_t event) {
 
 void TimeScreen::handleStepDaysStart_(int8_t stepDirection, int daysToStep) {
     mp_timeTaskHandler->startStepDaysTask(stepDirection, daysToStep);
-    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_STEP, LV_BTNM_CTRL_TGL_STATE);
-    // TODO: disable ui elements
+
+    // inactive all buttons
+    lv_btnm_ext_t* btnmExt = (lv_btnm_ext_t*)lv_obj_get_ext_attr(mp_buttonMatrix);
+    for (uint16_t i = 0; i < btnmExt->btn_cnt; i++) {
+        btnmExt->ctrl_bits[i] |= LV_BTNM_CTRL_INACTIVE;
+    }
+    btnmExt->ctrl_bits[BUTTON_STEP] = LV_BTNM_CTRL_TGL_STATE;
+    lv_obj_invalidate(mp_buttonMatrix);
+
     m_isInStepDays = true;
 }
 
 void TimeScreen::handleStepDaysEnd_() {
-    lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_STEP, LV_BTNM_CTRL_TGL_STATE);
+    // active all buttons
+    lv_btnm_ext_t* btnmExt = (lv_btnm_ext_t*)lv_obj_get_ext_attr(mp_buttonMatrix);
+    for (uint16_t i = 0; i < btnmExt->btn_cnt; i++) {
+        btnmExt->ctrl_bits[i] &= ~LV_BTNM_CTRL_INACTIVE;
+    }
+    btnmExt->ctrl_bits[BUTTON_STEP] = 0;
+    lv_obj_invalidate(mp_buttonMatrix);
+
     m_isInStepDays = false;
 }
