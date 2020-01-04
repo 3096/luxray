@@ -13,20 +13,22 @@ class TimeScreen : public Screen {
     static constexpr const char* STRING_TARGET_CHANGE = "Target Change:";
     static constexpr const char* STRING_STEPPING = "Step Remaining:";
     static constexpr const char* STRING_DAYS = " days";
-
-    static constexpr const char* BUTTON_MAP_LAYOUT[] = {
+    static constexpr const char* INITIAL_BUTTON_MAP[] = {
         "1", "2", "3", "Set", "+1", "\n",
         "4", "5", "6", "Step", "+2", "\n",
         "7", "8", "9", "NTP", "+3", "\n",
         "-", "0", "<-", "Auto", "Reset", ""
     };
+    static constexpr const uint16_t STEP_MAP_IDX = 9;
+    static constexpr const char* STRING_STEP = INITIAL_BUTTON_MAP[STEP_MAP_IDX];
+    static constexpr const char* STRING_STEP_CANCEL = "Cancel";
+
     /*  Button IDs:
         "1"= 0,  "2"= 1,  "3"= 2,   "Set"= 3,   "+1"= 4,
         "4"= 5,  "5"= 6,  "6"= 7,   "Step"= 8,  "+2"= 9,
         "7"= 10, "8"= 11, "9"= 12,  "NTP"= 13,  "+3"= 14,
         "-"= 15, "0"= 16, "<-"= 17, "Auto"= 18, "Reset"= 19
     */
-
     enum Button {
         BUTTON_SET = 3,
         BUTTON_PLUS_ONE = 4,
@@ -47,6 +49,7 @@ class TimeScreen : public Screen {
     lv_obj_t* mp_promptLabel;
     lv_obj_t* mp_valueLabel;
     lv_obj_t* mp_buttonMatrix;
+    const char* m_buttonMap[24];
 
     bool m_doButtonClick;
     bool m_doNTP;
