@@ -15,29 +15,29 @@ class TimeScreen : public Screen {
     static constexpr const char* STRING_DAYS = " days";
 
     static constexpr const char* BUTTON_MAP_LAYOUT[] = {
-        "1", "2", "3", "R/S", "+1", "\n",
-        "4", "5", "6", "Set", "+3", "\n",
-        "7", "8", "9", "Step", "-1", "\n",
-        "-", "0", "<-", "NTP", " ", ""
+        "1", "2", "3", "Set", "+1", "\n",
+        "4", "5", "6", "Step", "+2", "\n",
+        "7", "8", "9", "NTP", "+3", "\n",
+        "-", "0", "<-", "Auto", "Reset", ""
     };
     /*  Button IDs:
-        "1"= 0,  "2"= 1,  "3"= 2,   "R/S"= 3,   "+1"= 4,
-        "4"= 5,  "5"= 6,  "6"= 7,   "Set"= 8,   "+3"= 9,
-        "7"= 10, "8"= 11, "9"= 12,  "Step"= 13, "-1"= 14,
-        "-"= 15, "0"= 16, "<-"= 17, "NTP"= 18,  "Stop"= 19
+        "1"= 0,  "2"= 1,  "3"= 2,   "Set"= 3,   "+1"= 4,
+        "4"= 5,  "5"= 6,  "6"= 7,   "Step"= 8,  "+2"= 9,
+        "7"= 10, "8"= 11, "9"= 12,  "NTP"= 13,  "+3"= 14,
+        "-"= 15, "0"= 16, "<-"= 17, "Auto"= 18, "Reset"= 19
     */
 
     enum Button {
-        BUTTON_RESET = 3,
+        BUTTON_SET = 3,
         BUTTON_PLUS_ONE = 4,
-        BUTTON_SET = 8,
-        BUTTON_PLUS_THREE = 9,
-        BUTTON_STEP = 13,
-        BUTTON_MINUS_ONE = 14,
+        BUTTON_STEP = 8,
+        BUTTON_PLUS_TWO = 9,
+        BUTTON_NTP = 13,
+        BUTTON_PLUS_THREE = 14,
         BUTTON_NEGATIVE = 15,
         BUTTON_BACKSPACE = 17,
-        BUTTON_NTP = 18,
-        BUTTON_UNUSED = 19  // TODO: make step button do stop task
+        BUTTON_AUTORESET = 18,
+        BUTTON_RESET = 19
     };
 
     static constexpr int MAX_TARGET_CHANGE = 99999;
@@ -50,6 +50,7 @@ class TimeScreen : public Screen {
 
     bool m_doButtonClick;
     bool m_doNTP;
+    bool m_doAutoReset;
     bool m_isInStepDays;
     bool m_internetIsConnected;
 

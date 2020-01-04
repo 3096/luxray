@@ -15,7 +15,7 @@ static void style_mod(lv_group_t* group, lv_style_t* style) {
     style->body.border.opa = LV_OPA_COVER;
     style->body.border.color = lv_color_hex(0xFFD600);
 
-    // /*If not empty or has border then emphasis the border*/
+    // If not empty or has border then emphasis the border
     if (style->body.opa != LV_OPA_TRANSP or style->body.border.width != 0) style->body.border.width = LV_DPI / 30;
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, lv_color_hex(0xFFD600), LV_OPA_60);
 }
@@ -25,6 +25,7 @@ TimeScreen::TimeScreen(lv_obj_t* prevScreen)
       mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
       m_doButtonClick(false),
       m_doNTP(true),
+      m_doAutoReset(true),
       m_isInStepDays(false),
       m_internetIsConnected(false),
       m_curTargetChange(0),
@@ -41,6 +42,8 @@ TimeScreen::TimeScreen(lv_obj_t* prevScreen)
     mp_buttonMatrix = lv_btnm_create(p_window, NULL);
     lv_btnm_set_map(mp_buttonMatrix, (const char**)BUTTON_MAP_LAYOUT);
     lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNM_CTRL_TGL_ENABLE);
+    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNM_CTRL_TGL_ENABLE);
+    if (m_doAutoReset) lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNM_CTRL_TGL_STATE);
     lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_INACTIVE);
     lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
     lv_obj_set_event_cb(mp_buttonMatrix, handleButtonEvent_);
@@ -73,7 +76,6 @@ bool TimeScreen::procFrame_() {
         m_promptLabelStr += STRING_TARGET_CHANGE;
     }
 
-    // TODO: UI change should disable m_curTargetSign change when stepping
     m_valueLabelStr += std::to_string(m_curTargetSign * m_curTargetChange);
     m_valueLabelStr += STRING_DAYS;
 
@@ -93,7 +95,7 @@ bool TimeScreen::procFrame_() {
     }
 
     gp_overlay->resumeRendering();
-    return Screen::procFrame_();
+    return Screen::procFrame_() or m_isInStepDays;
 }
 
 void TimeScreen::handleButtonEventImpl_() {
@@ -122,23 +124,29 @@ void TimeScreen::handleButtonEventImpl_() {
                 lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNM_CTRL_TGL_STATE);
             }
             return;
-        case BUTTON_PLUS_ONE:
-            mp_timeTaskHandler->setDayChange(1);
-            break;
+        case BUTTON_AUTORESET:
+            m_doAutoReset = !m_doAutoReset;
+            return;
         case BUTTON_SET:
             if (m_curTargetChange == 0) {
                 return;
             }
             mp_timeTaskHandler->setDayChange(m_curTargetSign * m_curTargetChange);
             break;
-        case BUTTON_PLUS_THREE:
-            handleStepDaysStart_(1, 3);
-            break;
         case BUTTON_STEP:
             if (m_curTargetChange == 0) {
                 return;
             }
             handleStepDaysStart_(m_curTargetSign, m_curTargetChange);
+            break;
+        case BUTTON_PLUS_ONE:
+            mp_timeTaskHandler->setDayChange(1);
+            break;
+        case BUTTON_PLUS_TWO:
+            handleStepDaysStart_(1, 2);
+            break;
+        case BUTTON_PLUS_THREE:
+            handleStepDaysStart_(1, 3);
             break;
         case BUTTON_NEGATIVE:
             m_curTargetSign *= -1;
@@ -152,11 +160,6 @@ void TimeScreen::handleButtonEventImpl_() {
                 lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_TGL_STATE);
                 m_doNTP = false;
             }
-            return;
-        case BUTTON_MINUS_ONE:
-            mp_timeTaskHandler->setDayChange(-1);
-            break;
-        case BUTTON_UNUSED:
             return;
         default:  // number button
             m_curTargetChange = m_curTargetChange * 10 + (lv_btnm_get_active_btn_text(mp_buttonMatrix)[0] - '0');
@@ -177,7 +180,7 @@ void TimeScreen::handleButtonEvent_(lv_obj_t* btnm, lv_event_t event) {
 }
 
 void TimeScreen::handleStepDaysStart_(int8_t stepDirection, int daysToStep) {
-    mp_timeTaskHandler->startStepDaysTask(stepDirection, daysToStep);
+    mp_timeTaskHandler->startStepDaysTask(stepDirection, daysToStep, m_doAutoReset);
 
     // inactive all buttons
     lv_btnm_ext_t* btnmExt = (lv_btnm_ext_t*)lv_obj_get_ext_attr(mp_buttonMatrix);

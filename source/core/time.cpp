@@ -8,10 +8,10 @@
 #include "time.hpp"
 
 TimeTaskHandler::TimeTaskHandler()
-    : STEP_TICK_INTERVAL(STEP_INTERVAL * armGetSystemTickFreq()),
+    : STEP_INTERVAL_TICKS(STEP_INTERVAL * armGetSystemTickFreq()),
       m_curTimeChange(0),
-      m_curDaysLeftToStep(0),
-      m_lastStepIntervalNum(0) {
+      m_curDaysLeftToStep(-1),
+      m_lastStepTick(0) {
     handleTask();
 }
 
@@ -24,20 +24,24 @@ void TimeTaskHandler::handleTask() {
         throw std::runtime_error(err_msg);
     }
 
-    if (m_curDaysLeftToStep > 0) {
-        u64 curStepIntervalNum = armGetSystemTick() / STEP_TICK_INTERVAL;
-        if (curStepIntervalNum > m_lastStepIntervalNum) {
-            setDayChange(m_curStepDirection);
+    if (m_curDaysLeftToStep >= 0) {
+        u64 curSystemTick = armGetSystemTick();
+        if (curSystemTick - m_lastStepTick > STEP_INTERVAL_TICKS) {
+            if (m_curDaysLeftToStep > 0) {
+                setDayChange(m_curStepDirection);
+            } else if (m_resetAfterStep) {
+                resetTime();
+            }
+            m_lastStepTick = curSystemTick;
             m_curDaysLeftToStep--;
-            m_lastStepIntervalNum = curStepIntervalNum;
         }
     }
 }
 
-void TimeTaskHandler::startStepDaysTask(int8_t stepDirection, int daysToStep) {
+void TimeTaskHandler::startStepDaysTask(int8_t stepDirection, int daysToStep, bool resetAfterStep) {
     m_curStepDirection = stepDirection;
     m_curDaysLeftToStep = daysToStep;
-    m_lastStepIntervalNum = armGetSystemTick() / STEP_TICK_INTERVAL;
+    m_resetAfterStep = resetAfterStep;
 }
 
 std::string TimeTaskHandler::getCurDateStr() {
@@ -62,8 +66,12 @@ void TimeTaskHandler::setDayChange(int dayChange) {
 }
 
 void TimeTaskHandler::setTimeNTP() {
-    setTime_(ntpGetTime());
-    m_curTimeChange = 0;
+    try {
+        setTime_(ntpGetTime());
+        m_curTimeChange = 0;
+    } catch (std::runtime_error& e) {
+        LOG("runtime_error: %s", e.what());
+    }
 }
 
 void TimeTaskHandler::resetTime() {
