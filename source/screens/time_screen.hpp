@@ -50,6 +50,7 @@ class TimeScreen : public Screen {
     lv_obj_t* mp_valueLabel;
     lv_obj_t* mp_buttonMatrix;
     const char* m_buttonMap[24];
+    lv_group_t* mp_inputGroup;
 
     bool m_doButtonClick;
     bool m_doNTP;
@@ -70,8 +71,10 @@ class TimeScreen : public Screen {
 
     // poly
     virtual bool procFrame_();
+    virtual void mount_();
+    virtual void unmount_();
 
    public:
-    TimeScreen(lv_obj_t* prevScreen);
+    TimeScreen(Screen* prevScreen);
     ~TimeScreen();
 };

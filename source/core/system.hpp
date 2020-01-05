@@ -2,4 +2,6 @@
 
 namespace os {
 bool nifmInternetIsConnected();
+
+bool setsysInternetTimeSyncIsOn();
 }

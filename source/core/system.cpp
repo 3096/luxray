@@ -17,3 +17,14 @@ bool os::nifmInternetIsConnected() {
 
     return nifmICS == NifmInternetConnectionStatus_Connected;
 }
+
+bool os::setsysInternetTimeSyncIsOn() {
+    bool internetTimeSyncIsOn;
+    Result rs = setsysIsUserSystemClockAutomaticCorrectionEnabled(&internetTimeSyncIsOn);
+    if (R_FAILED(rs)) {
+        std::string msg = "Unable to detect if Internet time sync is enabled: " + std::to_string(rs);
+        throw std::runtime_error(msg);
+    }
+
+    return internetTimeSyncIsOn;
+}

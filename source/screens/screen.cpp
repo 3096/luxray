@@ -6,16 +6,19 @@
 
 extern Overlay* gp_overlay;
 
-Screen::Screen(lv_obj_t* prevScreen)
+Screen::Screen(Screen* prevScreen)
     : mp_prevScreen(prevScreen),
       m_ScreenIsJustToggled(false),
-      mp_thisScreen(lv_obj_create(nullptr, nullptr)),
-      m_screenIsOn(true) {}
+      m_screenIsOn(true),
+      mp_screenObj(lv_obj_create(nullptr, nullptr)) {}
 
-Screen::~Screen() { lv_obj_del(mp_thisScreen); }
+Screen::~Screen() { lv_obj_del(mp_screenObj); }
 
 void Screen::show() {
-    lv_scr_load(mp_thisScreen);
+    if (mp_prevScreen) {
+        mp_prevScreen->unmount_();
+    }
+    mount_();
 
     while (true) {
         hidScanInput();
@@ -27,7 +30,7 @@ void Screen::show() {
             m_screenIsOn = !m_screenIsOn;
             m_ScreenIsJustToggled = true;
             if (m_screenIsOn) {
-                lv_obj_invalidate(mp_thisScreen);  // Re-render screen
+                lv_obj_invalidate(mp_screenObj);  // Re-render screen
             } else {
                 gp_overlay->flushEmptyFb();  // Turn off screen
             }
@@ -44,9 +47,14 @@ void Screen::show() {
         }
     }
 
+    unmount_();
     if (mp_prevScreen) {
-        lv_scr_load(mp_prevScreen);
+        mp_prevScreen->mount_();
     }
 }
 
 bool Screen::procFrame_() { return not((m_keysDown & KEY_L) and m_screenIsOn); }
+
+void Screen::mount_() { lv_scr_load(mp_screenObj); }
+
+void Screen::unmount_() {}

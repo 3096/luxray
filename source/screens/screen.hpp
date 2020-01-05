@@ -4,21 +4,23 @@
 
 class Screen {
    private:
-    lv_obj_t* mp_prevScreen;
+    Screen* mp_prevScreen;
 
     bool m_ScreenIsJustToggled;
+    bool m_screenIsOn;
 
    protected:
-    lv_obj_t* mp_thisScreen;
-    bool m_screenIsOn;
+    lv_obj_t* mp_screenObj;
 
     uint64_t m_keysDown;
     uint64_t m_keysHeld;
 
     virtual bool procFrame_();
+    virtual void mount_();
+    virtual void unmount_();
 
    public:
-    Screen(lv_obj_t* prevScreen);
+    Screen(Screen* prevScreen);
     virtual ~Screen();
 
     void show();

@@ -22,7 +22,7 @@ static void style_mod(lv_group_t* group, lv_style_t* style) {
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, lv_color_hex(0xFFD600), LV_OPA_60);
 }
 
-TimeScreen::TimeScreen(lv_obj_t* prevScreen)
+TimeScreen::TimeScreen(Screen* prevScreen)
     : Screen(prevScreen),
       mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
       m_doButtonClick(false),
@@ -32,7 +32,7 @@ TimeScreen::TimeScreen(lv_obj_t* prevScreen)
       m_internetIsConnected(false),
       m_curTargetChange(0),
       m_curTargetSign(1) {
-    lv_obj_t* p_window = lv_win_create(mp_thisScreen, nullptr);
+    lv_obj_t* p_window = lv_win_create(mp_screenObj, nullptr);
     lv_win_set_title(p_window, "  Date Advance");
 
     mp_promptLabel = lv_label_create(p_window, nullptr);
@@ -51,10 +51,9 @@ TimeScreen::TimeScreen(lv_obj_t* prevScreen)
     lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
     lv_obj_set_event_cb(mp_buttonMatrix, handleButtonEvent_);
 
-    lv_group_t* p_inputGroup = lv_group_create();
-    lv_group_set_style_mod_cb(p_inputGroup, style_mod);
-    lv_group_add_obj(p_inputGroup, mp_buttonMatrix);
-    lv_indev_set_group(gp_keyIn, p_inputGroup);
+    mp_inputGroup = lv_group_create();
+    lv_group_set_style_mod_cb(mp_inputGroup, style_mod);
+    lv_group_add_obj(mp_inputGroup, mp_buttonMatrix);
 }
 
 TimeScreen::~TimeScreen() {}
@@ -99,6 +98,17 @@ bool TimeScreen::procFrame_() {
 
     gp_overlay->resumeRendering();
     return Screen::procFrame_() or m_isInStepDays;
+}
+
+void TimeScreen::mount_() {
+    lv_indev_set_group(gp_keyIn, mp_inputGroup);
+    Screen::mount_();
+}
+
+void TimeScreen::unmount_() {
+    // temp: main screen has no group for now, so unregister our group
+    lv_indev_set_group(gp_keyIn, nullptr);
+    m_doButtonClick = false;
 }
 
 void TimeScreen::handleButtonEventImpl_() {
