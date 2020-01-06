@@ -11,7 +11,8 @@ Luxray is an overlay utility for Pokémon in the form of a sysmodule.
 TODO:
 
 - 0.1.0
-  - Test best font for use with 4/3x upscale UI (for handheld)
+  - Check lvgl config
+  - Test heap sizes
   - Improve launcher
 
 - somewhere down the line
@@ -20,4 +21,5 @@ TODO:
     - make step interval configurable
   - Refactor style code
   - Refactor Makefile
+    - Also make dock/handheld build mode output to different build dir
   - Launcher checks for update

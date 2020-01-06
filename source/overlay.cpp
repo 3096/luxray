@@ -21,7 +21,8 @@ Overlay::Overlay() {
     TRY_GOTO(viCreateLayer(&m_viDisplay, &m_viLayer), close_managed_layer);
     TRY_GOTO(viSetLayerScalingMode(&m_viLayer, ViScalingMode_FitToLayer), close_managed_layer);
     TRY_GOTO(viSetLayerZ(&m_viLayer, 100), close_managed_layer);  // Arbitrary z index
-    TRY_GOTO(viSetLayerSize(&m_viLayer, OVERLAY_WIDTH, OVERLAY_HEIGHT), close_managed_layer);
+    TRY_GOTO(viSetLayerSize(&m_viLayer, OVERLAY_WIDTH_BASE * OVERLAY_SCALE, OVERLAY_HEIGHT_BASE * OVERLAY_SCALE),
+             close_managed_layer);
     TRY_GOTO(viSetLayerPosition(&m_viLayer, OVERLAY_POS_X, OVERLAY_POS_Y), close_managed_layer);
     TRY_GOTO(nwindowCreateFromLayer(&m_nWindow, &m_viLayer), close_managed_layer);
     TRY_GOTO(
@@ -58,12 +59,10 @@ Overlay::Overlay() {
     mp_theme->style.scr->body.main_color = {0, 0, 0, 0x7F};
     mp_theme->style.scr->body.grad_color = {0, 0, 0, 0x7F};
     mp_theme->style.scr->text.color = LV_COLOR_WHITE;
-    mp_theme->style.scr->text.font = &lv_font_roboto_22;
 
     mp_theme->style.win.header->body.main_color = lv_color_hex(0x1976D2);
     mp_theme->style.win.header->body.grad_color = lv_color_hex(0x1976D2);
     mp_theme->style.win.header->text.color = LV_COLOR_WHITE;
-    mp_theme->style.win.header->text.font = &lv_font_roboto_22;
     mp_theme->style.win.bg = &lv_style_transp;
 
     mp_theme->style.btnm.bg->body.main_color = lv_color_hex(0x263238);
@@ -72,18 +71,24 @@ Overlay::Overlay() {
     mp_theme->style.btnm.bg->body.shadow.color = lv_color_hex(0x707070);
     mp_theme->style.btnm.btn.rel->body.border.color = lv_color_hex(0x707070);
     mp_theme->style.btnm.btn.rel->text.color = LV_COLOR_WHITE;
+#ifdef HANDHELD
+    mp_theme->style.btnm.btn.rel->text.font = &lv_font_roboto_22;
+#else
+    mp_theme->style.btnm.btn.rel->text.font = &lv_font_roboto_16;
+#endif
     mp_theme->style.btnm.btn.pr->body = mp_theme->style.btnm.btn.rel->body;
     mp_theme->style.btnm.btn.pr->body.main_color = lv_color_hex(0x607D8B);
     mp_theme->style.btnm.btn.pr->body.grad_color = lv_color_hex(0x607D8B);
     mp_theme->style.btnm.btn.pr->body.opa = LV_OPA_100;
-    mp_theme->style.btnm.btn.pr->text.color = LV_COLOR_WHITE;
+    mp_theme->style.btnm.btn.pr->text = mp_theme->style.btnm.btn.rel->text;
     mp_theme->style.btnm.btn.tgl_pr->body = mp_theme->style.btnm.btn.pr->body;
-    mp_theme->style.btnm.btn.tgl_pr->text.color = LV_COLOR_WHITE;
+    mp_theme->style.btnm.btn.tgl_pr->text = mp_theme->style.btnm.btn.rel->text;
     mp_theme->style.btnm.btn.tgl_rel->body = mp_theme->style.btnm.btn.pr->body;
     mp_theme->style.btnm.btn.tgl_rel->body.main_color = lv_color_hex(0x455A64);
     mp_theme->style.btnm.btn.tgl_rel->body.grad_color = lv_color_hex(0x455A64);
-    mp_theme->style.btnm.btn.tgl_rel->text.color = LV_COLOR_WHITE;
+    mp_theme->style.btnm.btn.tgl_rel->text = mp_theme->style.btnm.btn.rel->text;
     mp_theme->style.btnm.btn.ina->body = mp_theme->style.btnm.btn.rel->body;
+    mp_theme->style.btnm.btn.ina->text = mp_theme->style.btnm.btn.rel->text;
     mp_theme->style.btnm.btn.ina->text.color = lv_color_hex(0x424242);
 
     lv_theme_set_current(mp_theme);
@@ -178,8 +183,13 @@ bool Overlay::touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
     if (data->state == LV_INDEV_STATE_PR) {
         touchPosition touch;
         hidTouchRead(&touch, 0);
+#ifdef HANDHELD
+        data->point.x = touch.px - OVERLAY_POS_X;
+        data->point.y = touch.py - OVERLAY_POS_Y;
+#else
         data->point.x = touch.px * SCREEN_WIDTH / SCREEN_WIDTH_HANDHELD - OVERLAY_POS_X;
         data->point.y = touch.py * SCREEN_HEIGHT / SCREEN_HEIGHT_HANDHELD - OVERLAY_POS_Y;
+#endif
     }
 
     return false; /*Return `false` because we are not buffering and no more data to read*/

@@ -6,7 +6,12 @@
 
 class TimeTaskHandler {
    private:
-    static constexpr float STEP_INTERVAL = 0.5;
+    // TODO: STEP_INTERVAL should be configurable since apparently only some switches are laggier than others
+#ifdef HANDHELD
+    static constexpr float STEP_INTERVAL = 0.36;
+#else
+    static constexpr float STEP_INTERVAL = 0.45;
+#endif
     const uint64_t STEP_INTERVAL_TICKS;
 
     time_t m_curTime;

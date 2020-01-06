@@ -12,15 +12,12 @@ extern lv_indev_t* gp_touchIn;
 
 class Overlay {
    public:
-    static constexpr u_int32_t SCREEN_WIDTH = 1920;
-    static constexpr u_int32_t SCREEN_HEIGHT = 1080;
-    static constexpr u_int32_t SCREEN_WIDTH_HANDHELD = 1280;
-    static constexpr u_int32_t SCREEN_HEIGHT_HANDHELD = 720;
+    static constexpr const uint16_t SCREEN_WIDTH = 1920;
+    static constexpr const uint16_t SCREEN_HEIGHT = 1080;
+    static constexpr const uint16_t SCREEN_WIDTH_HANDHELD = 1280;
+    static constexpr const uint16_t SCREEN_HEIGHT_HANDHELD = 720;
 
-    static constexpr size_t OVERLAY_BUF_LENGTH = OVERLAY_WIDTH * OVERLAY_HEIGHT;
-
-    static constexpr float OVERLAY_POS_X = 0;
-    static constexpr float OVERLAY_POS_Y = OVERLAY_HEIGHT_BASE * 2 - OVERLAY_HEIGHT_BASE * OVERLAY_SCALE;
+    static constexpr const size_t OVERLAY_BUF_LENGTH = OVERLAY_WIDTH * OVERLAY_HEIGHT;
 
     ViDisplay m_viDisplay;
     ViLayer m_viLayer;
