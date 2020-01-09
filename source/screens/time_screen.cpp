@@ -216,7 +216,11 @@ void TimeScreen::handleStepDaysEnd_() {
     for (uint16_t i = 0; i < btnmExt->btn_cnt; i++) {
         btnmExt->ctrl_bits[i] &= ~LV_BTNM_CTRL_INACTIVE;
     }
-    btnmExt->ctrl_bits[BUTTON_STEP] = 0;
+    // except NTP button if it's inactive
+    if (not m_internetIsConnected) {
+        btnmExt->ctrl_bits[BUTTON_NTP] |= LV_BTNM_CTRL_INACTIVE;
+    }
+    btnmExt->ctrl_bits[BUTTON_STEP] = 0;  // clear step button's toggle
     lv_obj_invalidate(mp_buttonMatrix);
 
     m_isInStepDays = false;
