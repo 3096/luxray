@@ -38,16 +38,21 @@ include $(DEVKITPRO)/libnx/switch_rules
 #   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
 
-APP_TITLE	:=	Luxray Vision
+APP_TITLE	:=	Luxray
 APP_AUTHOR	:=	3096
-APP_VERSION	:=	d0.0.1
+APP_VERSION	:=	w0.0.1
 
-TARGET		:=	luxray_vision
+TARGET		:=	luxray_launcher
 BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
 #ROMFS	:=	romfs
+
+GITREV  := $(shell git rev-parse HEAD)
+ifneq ($(GITREV),)
+APP_VERSION := $(APP_VERSION)-$(GITREV)
+endif
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -59,7 +64,7 @@ CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
+CXXFLAGS	:= $(CFLAGS) -fno-rtti
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
