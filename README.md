@@ -13,7 +13,7 @@ TODO:
 - 0.1.0
   - Check lvgl config
   - Test heap sizes
-  - Improve launcher
+  - Add help docs
 
 - somewhere down the line
   - Add settings page
@@ -23,3 +23,4 @@ TODO:
   - Refactor Makefile
     - Also make dock/handheld build mode output to different build dir
   - Launcher checks for update
+  - Add lv_btnm edge roll over
