@@ -22,5 +22,13 @@ TODO:
   - Refactor Makefile
     - Also make dock/handheld build mode output to different build dir
   - Launcher checks for update
+    - Maybe a canary update channel?
   - Add lv_btnm edge roll over
   - Switch between DOCKED/HANDHELD without the launcher
+
+- will probably not happen (depending on how much school sucks my time)
+  - Info display (powered by capture sight?)
+    - pokemon info/seed/stuff
+  - Routine automation (botbase style?)
+    - Host a service for commands over network
+    - Simple script engine

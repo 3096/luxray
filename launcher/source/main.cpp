@@ -12,7 +12,7 @@ const uint64_t LUXRAY_HANDHELD_TITLE_ID = 0x0100000000000405;
 const char* LUXRAY_DOCKED_EXEFS_PATH = "sdmc:/atmosphere/contents/0100000000000195/exefs.nsp";
 const char* LUXRAY_HANDHELD_EXEFS_PATH = "sdmc:/atmosphere/contents/0100000000000405/exefs.nsp";
 
-uint64_t getPID(uint64_t& outPID) {
+bool getPID(uint64_t& outPID) {
     if (R_SUCCEEDED(pmdmntGetProcessId(&outPID, LUXRAY_DOCKED_TITLE_ID)) or
         R_SUCCEEDED(pmdmntGetProcessId(&outPID, LUXRAY_HANDHELD_TITLE_ID))) {
         return true;
@@ -60,6 +60,12 @@ bool showStartOptions() {
             return true;
         }
 
+        // check if luxray is running again just in case something weird happens
+        uint64_t pid;
+        if (getPID(pid)) {
+            return true;
+        }
+
         consoleUpdate(NULL);
     }
     return false;
@@ -69,7 +75,11 @@ bool showRunningOptions(uint64_t pid) {
     printf(
         "       A - Relaunch docked mode\n"
         "       Y - Relaunch handheld mode\n"
-        "       X - Stop Luxray\n");
+        "       X - Stop Luxray\n\n\n"
+        "Luxray Overlay Controls:\n\n"
+        "       R = enter\n"
+        // "       L = back\n"
+        "       D-pad Up + Right Stick Up = toggle overlay display\n");
 
     while (appletMainLoop()) {
         hidScanInput();
@@ -94,6 +104,12 @@ bool showRunningOptions(uint64_t pid) {
             return true;
         }
 
+        // check if luxray pid is still the same just in case something weird happens
+        uint64_t prevPid = pid;
+        if (not getPID(pid) or pid != prevPid) {
+            return true;
+        }
+
         consoleUpdate(NULL);
     }
     return false;
@@ -114,14 +130,14 @@ void launcherMain() {
 
     while (appletMainLoop()) {
         printf(CONSOLE_ESC(1;1H) CONSOLE_ESC(2J)  // clears console
-               CONSOLE_ESC(36;1m) "Luxray Launcher\n\n" CONSOLE_ESC(m));
+               CONSOLE_CYAN "Luxray Launcher\n\n" CONSOLE_RESET);
 
         // check files
         if (access(LUXRAY_DOCKED_EXEFS_PATH, F_OK) != 0) {
-            printf(CONSOLE_ESC(31;1m) "WARNING: did not find %s\n\n" CONSOLE_ESC(m), LUXRAY_DOCKED_EXEFS_PATH);
+            printf(CONSOLE_RED "WARNING: did not find %s\n\n" CONSOLE_RESET, LUXRAY_DOCKED_EXEFS_PATH);
         }
         if (access(LUXRAY_HANDHELD_EXEFS_PATH, F_OK) != 0) {
-            printf(CONSOLE_ESC(31;1m) "WARNING: did not find %s\n\n" CONSOLE_ESC(m), LUXRAY_HANDHELD_EXEFS_PATH);
+            printf(CONSOLE_RED "WARNING: did not find %s\n\n" CONSOLE_RESET, LUXRAY_HANDHELD_EXEFS_PATH);
         }
 
         printf("Press: + - Exit launcher\n");
@@ -148,8 +164,7 @@ int main(int argc, char* argv[]) {
     try {
         launcherMain();
     } catch (ResultError& resultError) {
-        printf(CONSOLE_ESC(31;1m) "\nResult error %s: 0x%x\n" CONSOLE_ESC(m), resultError.what(),
-               resultError.getResult());
+        printf(CONSOLE_RED "\nResult error %s: 0x%x\n" CONSOLE_RESET, resultError.what(), resultError.getResult());
         printf("\nPress + to exit...\n");
         while (appletMainLoop()) {
             consoleUpdate(NULL);
