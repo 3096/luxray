@@ -40,7 +40,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 
 APP_TITLE	:=	Luxray
 APP_AUTHOR	:=	3096
-APP_VERSION	:=	early_test
+APP_VERSION	:=	w0.1.0
 
 TARGET		:=	luxray
 BUILD		:=	build

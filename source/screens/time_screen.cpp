@@ -61,23 +61,23 @@ TimeScreen::~TimeScreen() {}
 bool TimeScreen::procFrame_() {
     gp_overlay->pauseRendering();  // lv tries to draw text before it knows where, smh
 
+    // handle task, needed every frame
     mp_timeTaskHandler->handleTask();
+    if (m_isInStepDays) {
+        if (mp_timeTaskHandler->isStepping()) {
+            m_curTargetChange = mp_timeTaskHandler->daysLeftToStep();
+        } else {
+            handleStepDaysEnd_();
+        }
+        m_promptLabelStr += STRING_STEPPING;
+    }
 
     // generate label strings
     m_promptLabelStr = STRING_CUR_DATE;
     m_promptLabelStr += "\n";
+    m_promptLabelStr += m_isInStepDays ? STRING_STEPPING : STRING_TARGET_CHANGE;
+
     m_valueLabelStr = mp_timeTaskHandler->getCurDateStr() + "\n";
-
-    if (m_isInStepDays) {
-        m_curTargetChange = mp_timeTaskHandler->daysLeftToStep();
-        if (not(m_curTargetChange > 0)) {
-            handleStepDaysEnd_();
-        }
-        m_promptLabelStr += STRING_STEPPING;
-    } else {
-        m_promptLabelStr += STRING_TARGET_CHANGE;
-    }
-
     m_valueLabelStr += std::to_string(m_curTargetSign * m_curTargetChange);
     m_valueLabelStr += STRING_DAYS;
 
@@ -123,7 +123,8 @@ void TimeScreen::handleButtonEventImpl_() {
     if (m_isInStepDays) {  // all other buttons are disabled
         if (button == BUTTON_STEP) {
             mp_timeTaskHandler->stopStepDaysTask();
-            handleStepDaysEnd_();
+            // disable step button in case need to wait for auto reset
+            lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_STEP, LV_BTNM_CTRL_INACTIVE);
         }
         return;
     }
@@ -136,14 +137,11 @@ void TimeScreen::handleButtonEventImpl_() {
                 m_curTargetSign = 1;
                 lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNM_CTRL_TGL_STATE);
             }
-            return;
+            break;
         case BUTTON_AUTORESET:
             m_doAutoReset = !m_doAutoReset;
             return;
         case BUTTON_SET:
-            if (m_curTargetChange == 0) {
-                return;
-            }
             mp_timeTaskHandler->setDayChange(m_curTargetSign * m_curTargetChange);
             break;
         case BUTTON_STEP:
@@ -153,7 +151,7 @@ void TimeScreen::handleButtonEventImpl_() {
             handleStepDaysStart_(m_curTargetSign, m_curTargetChange);
             break;
         case BUTTON_PLUS_ONE:
-            mp_timeTaskHandler->setDayChange(1);
+            handleStepDaysStart_(1, 1);
             break;
         case BUTTON_PLUS_TWO:
             handleStepDaysStart_(1, 2);
@@ -181,7 +179,7 @@ void TimeScreen::handleButtonEventImpl_() {
             }
             return;
     }
-    // time is changed
+    // time is changed from last NTP call
     lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_TGL_STATE);
     m_doNTP = true;
 }

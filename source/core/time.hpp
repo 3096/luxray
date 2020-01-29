@@ -15,10 +15,13 @@ class TimeTaskHandler {
     const uint64_t STEP_INTERVAL_TICKS;
 
     time_t m_curTime;
-    time_t m_curTimeChange;
+    struct tm m_resetTargetTm;
 
+    // step days members
     int m_curDaysLeftToStep;
     int m_curStepDirection;
+    bool m_isInStep;
+    bool m_isAbortingStep;
     bool m_resetAfterStep;
     uint64_t m_lastStepTick;
 
@@ -31,7 +34,8 @@ class TimeTaskHandler {
     void handleTask();
 
     void startStepDaysTask(int8_t sign, int daysToStep, bool resetAfterStep);
-    inline void stopStepDaysTask() { m_curDaysLeftToStep = 0; }
+    inline void stopStepDaysTask() { m_isAbortingStep = true; }
+    inline bool isStepping() { return m_isInStep; }
     inline int daysLeftToStep() { return m_curDaysLeftToStep; }
 
     std::string getCurDateStr();
