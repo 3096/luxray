@@ -35,7 +35,7 @@ void TimeTaskHandler::handleTask() {
                 }
                 m_isAbortingStep = m_isInStep = false;
             } else {
-                setTime_(m_curTime + m_curStepDirection * 60 * 60 * 24);
+                setTime_(m_curTime + m_curStepDirection * 60 * 60 * 24, false);
                 m_curDaysLeftToStep--;
             }
             m_lastStepTick = curSystemTick;
@@ -57,27 +57,20 @@ std::string TimeTaskHandler::getCurDateStr() {
     return std::string(dateStr);
 }
 
-void TimeTaskHandler::setTime_(time_t time) {
+void TimeTaskHandler::setTime_(time_t time, bool updateResetTarget) {
     Result rs = timeSetCurrentTime(TimeType_NetworkSystemClock, (uint64_t)time);
     if (R_FAILED(rs)) {
         std::string err_msg = "timeSetCurrentTime failed with " + rs;
         throw std::runtime_error(err_msg);
     }
-}
-
-void TimeTaskHandler::setDayChange(int dayChange) {
-    time_t timeToSet = m_curTime + (time_t)dayChange * 60 * 60 * 24;
-    setTime_(timeToSet);
-    m_resetTargetTm = *localtime(&timeToSet);
-}
-
-void TimeTaskHandler::setTimeNTP() {
-    try {
-        setTime_(ntpGetTime());
-    } catch (std::runtime_error& e) {
-        LOG("runtime_error: %s", e.what());
+    if (updateResetTarget) {
+        m_resetTargetTm = *localtime(&time);
     }
 }
+
+void TimeTaskHandler::setDayChange(int dayChange) { setTime_(m_curTime + (time_t)dayChange * 60 * 60 * 24); }
+
+void TimeTaskHandler::setTimeNTP() { setTime_(ntpGetTime()); }
 
 void TimeTaskHandler::resetTime() {
     // use current HMS so only the date is reset

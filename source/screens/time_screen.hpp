@@ -17,7 +17,7 @@ class TimeScreen : public Screen {
         "1", "2", "3", "Set", "+1", "\n",
         "4", "5", "6", "Step", "+2", "\n",
         "7", "8", "9", "NTP", "+3", "\n",
-        "-", "0", "<-", "Auto", "Reset", ""
+        "-", "0", "<-", "Return", "Reset", ""
     };
     static constexpr const uint16_t STEP_MAP_IDX = 9;
     static constexpr const char* STRING_STEP = INITIAL_BUTTON_MAP[STEP_MAP_IDX];
@@ -44,7 +44,7 @@ class TimeScreen : public Screen {
 
     static constexpr int MAX_TARGET_CHANGE = 99999;
 
-    // members
+    // ui
     std::unique_ptr<TimeTaskHandler> mp_timeTaskHandler;
     lv_obj_t* mp_promptLabel;
     lv_obj_t* mp_valueLabel;
@@ -52,12 +52,15 @@ class TimeScreen : public Screen {
     const char* m_buttonMap[24];
     lv_group_t* mp_inputGroup;
 
+    // flags
     bool m_doButtonClick;
-    bool m_doNTP;
     bool m_doAutoReset;
     bool m_isInStepDays;
+    bool m_isAlreadyNTP;
+    bool m_disableNTP;
     bool m_internetIsConnected;
 
+    // values
     int m_curTargetChange;
     int8_t m_curTargetSign;
     std::string m_promptLabelStr;

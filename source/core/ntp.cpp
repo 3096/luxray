@@ -47,8 +47,8 @@ time_t ntpGetTime() {
 
                                  .tcp_tx_buf_size = 0x800,
                                  .tcp_rx_buf_size = 0x1000,
-                                 .tcp_tx_buf_max_size = 0x4000,
-                                 .tcp_rx_buf_max_size = 0x4000,
+                                 .tcp_tx_buf_max_size = 0,
+                                 .tcp_rx_buf_max_size = 0,
 
                                  .udp_tx_buf_size = 0x2400,
                                  .udp_rx_buf_size = 0xA500,

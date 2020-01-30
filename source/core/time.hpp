@@ -25,7 +25,7 @@ class TimeTaskHandler {
     bool m_resetAfterStep;
     uint64_t m_lastStepTick;
 
-    void setTime_(time_t time);
+    void setTime_(time_t time, bool updateResetTarget = true);
 
    public:
     TimeTaskHandler();

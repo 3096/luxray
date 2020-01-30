@@ -35,7 +35,7 @@
 
 #    define OVERLAY_FONT            lv_font_roboto_22
 
-#    define INNER_HEAP_SIZE         0x200000
+#    define INNER_HEAP_SIZE         0x1C0000
 #endif
 
 #define USE_LINEAR_BUF              0

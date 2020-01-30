@@ -26,9 +26,10 @@ TimeScreen::TimeScreen(Screen* prevScreen)
     : Screen(prevScreen),
       mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
       m_doButtonClick(false),
-      m_doNTP(true),
       m_doAutoReset(true),
       m_isInStepDays(false),
+      m_isAlreadyNTP(false),
+      m_disableNTP(false),
       m_internetIsConnected(false),
       m_curTargetChange(0),
       m_curTargetSign(1) {
@@ -87,7 +88,7 @@ bool TimeScreen::procFrame_() {
     lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -18, 18);
 
     // stuffs that can run less than every frame, might refactor
-    if (m_internetIsConnected != os::nifmInternetIsConnected()) {
+    if (not m_disableNTP and m_internetIsConnected != os::nifmInternetIsConnected()) {
         if (m_internetIsConnected) {
             lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_INACTIVE);
         } else {
@@ -137,7 +138,7 @@ void TimeScreen::handleButtonEventImpl_() {
                 m_curTargetSign = 1;
                 lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNM_CTRL_TGL_STATE);
             }
-            break;
+            return;
         case BUTTON_AUTORESET:
             m_doAutoReset = !m_doAutoReset;
             return;
@@ -166,10 +167,16 @@ void TimeScreen::handleButtonEventImpl_() {
             m_curTargetChange /= 10;
             return;
         case BUTTON_NTP:
-            if (m_internetIsConnected and m_doNTP) {
-                mp_timeTaskHandler->setTimeNTP();
-                lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_TGL_STATE);
-                m_doNTP = false;
+            if (m_internetIsConnected and not m_isAlreadyNTP) {
+                try {
+                    mp_timeTaskHandler->setTimeNTP();
+                    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_TGL_STATE);
+                    m_isAlreadyNTP = true;
+                } catch (std::runtime_error& e) {
+                    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_INACTIVE);
+                    m_disableNTP = true;
+                    LOG("NTP runtime_error: %s", e.what());
+                }
             }
             return;
         default:  // number button
@@ -181,7 +188,7 @@ void TimeScreen::handleButtonEventImpl_() {
     }
     // time is changed from last NTP call
     lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_TGL_STATE);
-    m_doNTP = true;
+    m_isAlreadyNTP = false;
 }
 
 void TimeScreen::handleButtonEvent_(lv_obj_t* btnm, lv_event_t event) {
@@ -215,7 +222,7 @@ void TimeScreen::handleStepDaysEnd_() {
         btnmExt->ctrl_bits[i] &= ~LV_BTNM_CTRL_INACTIVE;
     }
     // except NTP button if it's inactive
-    if (not m_internetIsConnected) {
+    if (m_disableNTP or not m_internetIsConnected) {
         btnmExt->ctrl_bits[BUTTON_NTP] |= LV_BTNM_CTRL_INACTIVE;
     }
     btnmExt->ctrl_bits[BUTTON_STEP] = 0;  // clear step button's toggle
