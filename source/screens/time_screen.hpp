@@ -71,6 +71,7 @@ class TimeScreen : public Screen {
     static void handleButtonEvent_(lv_obj_t* obj, lv_event_t event);
     void handleStepDaysStart_(int8_t stepDirection, int daysToStep);
     void handleStepDaysEnd_();
+    void updateLabels_();
 
     // poly
     virtual bool procFrame_();

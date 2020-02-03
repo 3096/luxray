@@ -55,6 +55,8 @@ TimeScreen::TimeScreen(Screen* prevScreen)
     mp_inputGroup = lv_group_create();
     lv_group_set_style_mod_cb(mp_inputGroup, style_mod);
     lv_group_add_obj(mp_inputGroup, mp_buttonMatrix);
+
+    updateLabels_();
 }
 
 TimeScreen::~TimeScreen() {}
@@ -70,22 +72,9 @@ bool TimeScreen::procFrame_() {
         } else {
             handleStepDaysEnd_();
         }
-        m_promptLabelStr += STRING_STEPPING;
     }
 
-    // generate label strings
-    m_promptLabelStr = STRING_CUR_DATE;
-    m_promptLabelStr += "\n";
-    m_promptLabelStr += m_isInStepDays ? STRING_STEPPING : STRING_TARGET_CHANGE;
-
-    m_valueLabelStr = mp_timeTaskHandler->getCurDateStr() + "\n";
-    m_valueLabelStr += std::to_string(m_curTargetSign * m_curTargetChange);
-    m_valueLabelStr += STRING_DAYS;
-
-    // render new text
-    lv_label_set_text(mp_promptLabel, m_promptLabelStr.c_str());
-    lv_label_set_text(mp_valueLabel, m_valueLabelStr.c_str());
-    lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -18, 18);
+    updateLabels_();
 
     // stuffs that can run less than every frame, might refactor
     if (not m_disableNTP and m_internetIsConnected != os::nifmInternetIsConnected()) {
@@ -229,4 +218,20 @@ void TimeScreen::handleStepDaysEnd_() {
     lv_obj_invalidate(mp_buttonMatrix);
 
     m_isInStepDays = false;
+}
+
+void TimeScreen::updateLabels_() {
+    // generate label strings
+    m_promptLabelStr = STRING_CUR_DATE;
+    m_promptLabelStr += "\n";
+    m_promptLabelStr += m_isInStepDays ? STRING_STEPPING : STRING_TARGET_CHANGE;
+
+    m_valueLabelStr = mp_timeTaskHandler->getCurDateStr() + "\n";
+    m_valueLabelStr += std::to_string(m_curTargetSign * m_curTargetChange);
+    m_valueLabelStr += STRING_DAYS;
+
+    // render new text
+    lv_label_set_text(mp_promptLabel, m_promptLabelStr.c_str());
+    lv_label_set_text(mp_valueLabel, m_valueLabelStr.c_str());
+    lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -18, 18);
 }

@@ -37,10 +37,11 @@ To-do list:
 ---
 
 - 0.1.1
-  - Add settings page
+  - Add main screen
+  - Add time settings screen
     - "auto reset after step" could be moved to the settings page
     - make step interval configurable
-  - Switch between DOCKED/HANDHELD without the launcher
+  - Switch between DOCKED/HANDHELD without the launcher under one unified build target
 
 - 0.2.0
   - Info display (reference capture sight?)
@@ -49,12 +50,13 @@ To-do list:
 - somewhere down the line
   - Refactor style code
   - Refactor Makefile
-    - Also make dock/handheld build mode output to different build dir
+    - Also make sysmodule/tesla menu build mode output to different build dir
   - Launcher checks for update
     - Maybe a canary update channel?
   - Add lv_btnm edge roll over
-
-- will probably not happen (depending on how much school sucks my time)
+  - Better adhere to GPL
+    - Add copyright headers to source files
+    - Add license to binaries
   - Routine automation (botbase style?)
     - Host a service for commands over network
     - Simple script engine
