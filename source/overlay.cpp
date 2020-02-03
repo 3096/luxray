@@ -9,6 +9,7 @@
 extern "C" u64 __nx_vi_layer_id;
 
 extern Overlay* gp_overlay;
+extern MainScreen* gp_mainScreen;
 
 lv_indev_t* gp_keyIn;
 lv_indev_t* gp_touchIn;
@@ -95,7 +96,7 @@ Overlay::Overlay() {
 
     LOG("lv initialized");
 
-    mp_mainScreen = std::make_unique<MainScreen>(nullptr);
+    gp_mainScreen = new MainScreen(nullptr);
 
     LOG("screens initialized");
 
@@ -121,6 +122,8 @@ end:
 Overlay::~Overlay() {
     LOG("Exit Overlay");
 
+    delete gp_mainScreen;
+
     framebufferClose(&m_frameBufferInfo);
     nwindowClose(&m_nWindow);
     viDestroyManagedLayer(&m_viLayer);
@@ -128,7 +131,7 @@ Overlay::~Overlay() {
     viExit();
 }
 
-void Overlay::run() { mp_mainScreen->show(); }
+void Overlay::run() { gp_mainScreen->show(); }
 
 Framebuffer* Overlay::getFbInfo_() { return &m_frameBufferInfo; }
 

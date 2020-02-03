@@ -35,8 +35,6 @@ class Overlay {
 
     lv_theme_t* mp_theme;
 
-    std::unique_ptr<MainScreen> mp_mainScreen;
-
     inline Framebuffer* getFbInfo_();
     inline void copyPrivFb_();
 
