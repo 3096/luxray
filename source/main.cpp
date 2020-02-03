@@ -1,14 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <memory>
-#include <string>
-
-#include <switch.h>
-
 #include "debug.hpp"
 #include "lvgl/lvgl.h"
 #include "overlay.hpp"
-#include "screens/time_screen.hpp"
 #include "util.hpp"
 
 extern "C" {
@@ -25,7 +17,6 @@ void __appExit(void);
 }
 
 Overlay* gp_overlay;
-TimeScreen* gp_timeScreen;
 
 void __libnx_initheap(void) {
     extern char* fake_heap_start;
