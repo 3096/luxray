@@ -40,12 +40,10 @@ void __appInit(void) {
     if (R_FAILED(smInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_SM));
     if (R_FAILED(hidInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_HID));
     if (R_FAILED(fsInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_FS));
-    if (R_FAILED(timeInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_Time));
     if (R_FAILED(rc = setsysInitialize())) fatalThrow(rc);
     if (R_FAILED(rc = nifmInitialize(NifmServiceType_User))) fatalThrow(rc);
 
     fsdevMountSdmc();
-    __libnx_init_time();
 }
 
 void __appExit(void) {
@@ -60,6 +58,10 @@ void __appExit(void) {
 }
 
 int main(int argc, char* argv[]) {
+    if (R_FAILED(timeInitialize())) {
+        return MAKERESULT(Module_Libnx, LibnxError_InitFail_Time);
+    }
+    __libnx_init_time();
     debugInit();
     LOG("Main start");
 
