@@ -30,5 +30,11 @@ bool MainScreen::procFrame_() {
             mp_timeErrorScreen->show();
         }
     }
-    return true;  // TODO: MainScreen may exit another way
+
+    // TODO: MainScreen may exit another way
+#ifdef TESLA
+    return Screen::procFrame_();
+#else
+    return true;
+#endif
 }

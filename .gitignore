@@ -41,6 +41,7 @@ release
 *.nro
 *.nsp
 *.npdm
+*.ovl
 
 # Other
 logs

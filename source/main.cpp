@@ -36,51 +36,46 @@ void __libnx_initheap(void) {
 
 void __appInit(void) {
     // Init/exit services
-    TRY(smInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_SM)));
-    TRY(hidInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_HID)));
-    TRY(fsInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_FS)));
-    TRY(timeInitialize(), fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_Time)));
-    TRY(setsysInitialize(), fatalThrow(rc));
-    TRY(nifmInitialize(NifmServiceType_User), fatalThrow(rc));
+    Result rc;
+    if (R_FAILED(smInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_SM));
+    if (R_FAILED(hidInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_HID));
+    if (R_FAILED(fsInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_FS));
+    if (R_FAILED(timeInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_Time));
+    if (R_FAILED(rc = setsysInitialize())) fatalThrow(rc);
+    if (R_FAILED(rc = nifmInitialize(NifmServiceType_User))) fatalThrow(rc);
 
-    __libnx_init_time();
     fsdevMountSdmc();
-    debugInit();
-
-    LOG("Service init");
-
-    try {
-        gp_overlay = new Overlay();
-    } catch (std::runtime_error& e) {
-        LOG("runtime_error: %s", e.what());
-        fatalThrow(MAKERESULT(405, 0));
-    }
+    __libnx_init_time();
 }
 
 void __appExit(void) {
     // Cleanup services.
-    LOG("Service cleanup");
-    delete gp_overlay;
-    debugExit();
     fsdevUnmountAll();
-    fsExit();
     nifmExit();
     setsysExit();
     timeExit();
+    fsExit();
     hidExit();
     smExit();
 }
 
 int main(int argc, char* argv[]) {
+    debugInit();
     LOG("Main start");
 
     try {
+        gp_overlay = new Overlay();
         gp_overlay->run();
     } catch (std::runtime_error& e) {
         LOG("runtime_error: %s", e.what());
     }
 
+    delete gp_overlay;
+
+#ifdef TESLA
+    envSetNextLoad("sdmc:/switch/.overlays/ovlmenu.ovl", "--initial-load");
+#endif
+
     LOG("Main exit");
-    __appExit();
-    return 0;
+    debugExit();
 }
