@@ -12,20 +12,9 @@ extern lv_indev_t* gp_touchIn;
 extern Overlay* gp_overlay;
 extern TimeScreen* gp_timeScreen;
 
-// TODO: refactor this func somewhere else
-static void style_mod(lv_group_t* group, lv_style_t* style) {
-    style->body.border.opa = LV_OPA_COVER;
-    style->body.border.color = lv_color_hex(0xFFD600);
-
-    // If not empty or has border then emphasis the border
-    if (style->body.opa != LV_OPA_TRANSP or style->body.border.width != 0) style->body.border.width = LV_DPI / 30;
-    style->body.shadow.color = lv_color_mix(style->body.shadow.color, lv_color_hex(0xFFD600), LV_OPA_60);
-}
-
 TimeScreen::TimeScreen(Screen* prevScreen)
     : Screen(prevScreen),
       mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
-      m_doButtonClick(false),
       m_doAutoReset(true),
       m_isInStepDays(false),
       m_isAlreadyNTP(false),
@@ -52,8 +41,6 @@ TimeScreen::TimeScreen(Screen* prevScreen)
     lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
     lv_obj_set_event_cb(mp_buttonMatrix, handleButtonEvent_);
 
-    mp_inputGroup = lv_group_create();
-    lv_group_set_style_mod_cb(mp_inputGroup, style_mod);
     lv_group_add_obj(mp_inputGroup, mp_buttonMatrix);
 
     updateLabels_();
@@ -90,24 +77,7 @@ bool TimeScreen::procFrame_() {
     return Screen::procFrame_() or m_isInStepDays;
 }
 
-void TimeScreen::mount_() {
-    lv_indev_set_group(gp_keyIn, mp_inputGroup);
-    Screen::mount_();
-}
-
-void TimeScreen::unmount_() {
-    // temp: main screen has no group for now, so unregister our group
-    lv_indev_set_group(gp_keyIn, nullptr);
-    m_doButtonClick = false;
-}
-
 void TimeScreen::handleButtonEventImpl_() {
-    // temp: ignore the first click cuz it's from the previous screen
-    if (not m_doButtonClick) {
-        m_doButtonClick = true;
-        return;
-    }
-
     Button button = (Button)lv_btnm_get_active_btn(mp_buttonMatrix);
 
     if (m_isInStepDays) {  // all other buttons are disabled

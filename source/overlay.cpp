@@ -2,6 +2,7 @@
 #include <stdexcept>
 
 #include "debug.hpp"
+#include "theme.hpp"
 #include "util.hpp"
 
 #include "overlay.hpp"
@@ -54,49 +55,11 @@ Overlay::Overlay() {
     m_keyDrv.read_cb = keysRead_;
     gp_keyIn = lv_indev_drv_register(&m_keyDrv);
 
-    // Theme style (temp)
-    // TODO: refactor this
-    mp_theme = lv_theme_material_init(200, nullptr);
-    mp_theme->style.scr->body.main_color = {0, 0, 0, 0x7F};
-    mp_theme->style.scr->body.grad_color = {0, 0, 0, 0x7F};
-    mp_theme->style.scr->text.color = LV_COLOR_WHITE;
-
-    mp_theme->style.win.header->body.main_color = lv_color_hex(0x1976D2);
-    mp_theme->style.win.header->body.grad_color = lv_color_hex(0x1976D2);
-    mp_theme->style.win.header->text.color = LV_COLOR_WHITE;
-    mp_theme->style.win.bg = &lv_style_transp;
-
-    mp_theme->style.btnm.bg->body.main_color = lv_color_hex(0x263238);
-    mp_theme->style.btnm.bg->body.grad_color = lv_color_hex(0x263238);
-    mp_theme->style.btnm.bg->body.border.color = lv_color_hex(0x707070);
-    mp_theme->style.btnm.bg->body.shadow.color = lv_color_hex(0x707070);
-    mp_theme->style.btnm.btn.rel->body.border.color = lv_color_hex(0x707070);
-    mp_theme->style.btnm.btn.rel->text.color = LV_COLOR_WHITE;
-#ifdef HANDHELD
-    mp_theme->style.btnm.btn.rel->text.font = &lv_font_roboto_22;
-#else
-    mp_theme->style.btnm.btn.rel->text.font = &lv_font_roboto_16;
-#endif
-    mp_theme->style.btnm.btn.pr->body = mp_theme->style.btnm.btn.rel->body;
-    mp_theme->style.btnm.btn.pr->body.main_color = lv_color_hex(0x607D8B);
-    mp_theme->style.btnm.btn.pr->body.grad_color = lv_color_hex(0x607D8B);
-    mp_theme->style.btnm.btn.pr->body.opa = LV_OPA_100;
-    mp_theme->style.btnm.btn.pr->text = mp_theme->style.btnm.btn.rel->text;
-    mp_theme->style.btnm.btn.tgl_pr->body = mp_theme->style.btnm.btn.pr->body;
-    mp_theme->style.btnm.btn.tgl_pr->text = mp_theme->style.btnm.btn.rel->text;
-    mp_theme->style.btnm.btn.tgl_rel->body = mp_theme->style.btnm.btn.pr->body;
-    mp_theme->style.btnm.btn.tgl_rel->body.main_color = lv_color_hex(0x455A64);
-    mp_theme->style.btnm.btn.tgl_rel->body.grad_color = lv_color_hex(0x455A64);
-    mp_theme->style.btnm.btn.tgl_rel->text = mp_theme->style.btnm.btn.rel->text;
-    mp_theme->style.btnm.btn.ina->body = mp_theme->style.btnm.btn.rel->body;
-    mp_theme->style.btnm.btn.ina->text = mp_theme->style.btnm.btn.rel->text;
-    mp_theme->style.btnm.btn.ina->text.color = lv_color_hex(0x424242);
-
-    lv_theme_set_current(mp_theme);
+    lv_theme_set_current(theme::getTheme());
 
     LOG("lv initialized");
 
-    gp_mainScreen = new MainScreen(nullptr);
+    gp_mainScreen = new MainScreen();
 
     LOG("screens initialized");
 
