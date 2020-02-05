@@ -9,8 +9,7 @@
 MainScreen* gp_mainScreen;
 TimeScreen* gp_timeScreen;
 
-MainScreen::MainScreen(Screen* prevScreen)
-    : Screen(prevScreen), m_screenToShow(NO_SUB_SCREEN), m_shouldContinue(true) {
+MainScreen::MainScreen() : Screen(nullptr), m_screenToShow(NO_SUB_SCREEN), m_shouldContinue(true) {
     gp_timeScreen = new TimeScreen(this);
     mp_timeErrorScreen = std::make_unique<TimeErrorScreen>(this);
 
@@ -21,6 +20,8 @@ MainScreen::MainScreen(Screen* prevScreen)
     // TODO: refactor the strings here
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Date Advance"), handleShowTimeScreen_);
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Exit"), handleExit_);
+
+    lv_group_add_obj(mp_inputGroup, mp_screenListObj);
 }
 
 MainScreen::~MainScreen() { delete gp_timeScreen; }

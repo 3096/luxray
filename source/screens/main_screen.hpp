@@ -31,6 +31,6 @@ class MainScreen : public Screen {
     static void handleExit_(lv_obj_t* obj, lv_event_t event);
 
    public:
-    MainScreen(Screen* prevScreen);
+    MainScreen();
     ~MainScreen();
 };

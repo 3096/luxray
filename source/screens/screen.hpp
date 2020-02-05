@@ -11,6 +11,7 @@ class Screen {
 
    protected:
     lv_obj_t* mp_screenObj;
+    lv_group_t* mp_inputGroup;
 
     uint64_t m_keysDown;
     uint64_t m_keysHeld;

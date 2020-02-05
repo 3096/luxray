@@ -1,6 +1,7 @@
 #include <switch.h>
 
 #include "../overlay.hpp"
+#include "../theme.hpp"
 
 #include "screen.hpp"
 
@@ -10,7 +11,10 @@ Screen::Screen(Screen* prevScreen)
     : mp_prevScreen(prevScreen),
       m_ScreenIsJustToggled(false),
       m_screenIsOn(true),
-      mp_screenObj(lv_obj_create(nullptr, nullptr)) {}
+      mp_screenObj(lv_obj_create(nullptr, nullptr)),
+      mp_inputGroup(lv_group_create()) {
+    lv_group_set_style_mod_cb(mp_inputGroup, theme::focusStyleMod);
+}
 
 Screen::~Screen() { lv_obj_del(mp_screenObj); }
 
@@ -55,6 +59,9 @@ void Screen::show() {
 
 bool Screen::procFrame_() { return not((m_keysDown & KEY_L) and m_screenIsOn); }
 
-void Screen::mount_() { lv_scr_load(mp_screenObj); }
+void Screen::mount_() {
+    lv_indev_set_group(gp_keyIn, mp_inputGroup);
+    lv_scr_load(mp_screenObj);
+}
 
 void Screen::unmount_() {}
