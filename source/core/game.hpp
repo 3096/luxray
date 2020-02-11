@@ -22,7 +22,6 @@ typedef struct {
 Result dmntchtInitialize();
 void dmntchtExit();
 Result dmntchtHasCheatProcess(bool* out);
-Result dmntchtGetCheatProcessEvent(Event* event);
 Result dmntchtForceOpenCheatProcess();
 Result dmntchtGetCheatProcessMetadata(DmntCheatProcessMetadata* out_metadata);
 Result dmntchtReadCheatProcessMemory(u64 address, void* buffer, size_t size);
@@ -32,12 +31,14 @@ class GameStateHandler {
    private:
     static constexpr uint64_t SW_TID = 0x0100ABF008968000;
     static constexpr uint64_t SH_TID = 0x01008DB008C2C000;
-    
+
     DmntCheatProcessMetadata m_dmntCheatProcessMetadata;
 
     bool ensureHasCheatProcess_();
 
    public:
+    static GameStateHandler* s_instance;
+
     GameStateHandler();
     ~GameStateHandler();
 

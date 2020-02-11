@@ -1,3 +1,4 @@
+#include "core/game.hpp"
 #include "debug.hpp"
 #include "lvgl/lvgl.h"
 #include "overlay.hpp"
@@ -57,12 +58,16 @@ int main(int argc, char* argv[]) {
     LOG("Main start");
 
     try {
+        // TODO: refactor resource aquisition
+        GameStateHandler::s_instance = new GameStateHandler();
+
         gp_overlay = new Overlay();
         gp_overlay->run();
     } catch (std::runtime_error& e) {
         LOG("runtime_error: %s", e.what());
     }
 
+    delete GameStateHandler::s_instance;
     delete gp_overlay;
 
 #ifdef TESLA

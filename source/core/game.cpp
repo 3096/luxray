@@ -1,6 +1,8 @@
 #include "game.hpp"
 #include "../util.hpp"
 
+GameStateHandler* GameStateHandler::s_instance = nullptr;
+
 GameStateHandler::GameStateHandler() {
     TRY_THROW(pmdmntInitialize());
     TRY_THROW(pminfoInitialize());
