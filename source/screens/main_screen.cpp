@@ -3,17 +3,22 @@
 #include "../core/system.hpp"
 #include "../debug.hpp"
 #include "den_list_screen.hpp"
+#include "poke_screen.hpp"
 #include "time_screen.hpp"
 
 #include "main_screen.hpp"
 
+// TODO: redo how screens are managed
+
 MainScreen* gp_mainScreen;
 TimeScreen* gp_timeScreen;
 DenListScreen* gp_denListScreen;
+PokeScreen* gp_pokeScreen;
 
 MainScreen::MainScreen() : Screen(nullptr), m_screenToShow(NO_SUB_SCREEN), m_shouldContinue(true) {
     gp_timeScreen = new TimeScreen(this);
     gp_denListScreen = new DenListScreen(this);
+    gp_pokeScreen = new PokeScreen(this);
     mp_timeErrorScreen = std::make_unique<TimeErrorScreen>(this);
 
     // list of buttons to different screens
@@ -23,6 +28,7 @@ MainScreen::MainScreen() : Screen(nullptr), m_screenToShow(NO_SUB_SCREEN), m_sho
     // TODO: refactor the strings here
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Date Advance"), handleShowTimeScreen_);
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Den List"), handleShowDenListScreen_);
+    lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Pokemon Stats"), handleShowDenListScreen_);
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Exit"), handleExit_);
 
     lv_group_add_obj(mp_inputGroup, mp_screenListObj);
@@ -41,6 +47,9 @@ bool MainScreen::procFrame_() {
             break;
         case DEN_LIST_SCREEN:
             gp_denListScreen->show();
+            break;
+        case POKE_SCREEN:
+            gp_pokeScreen->show();
             break;
         default:
             return m_shouldContinue;
@@ -62,6 +71,10 @@ void MainScreen::handleShowTimeScreen_(lv_obj_t* obj, lv_event_t event) {
 }
 
 void MainScreen::handleShowDenListScreen_(lv_obj_t* obj, lv_event_t event) {
+    gp_mainScreen->handleShowScreen_(event, DEN_LIST_SCREEN);
+}
+
+void MainScreen::handleShowPokeScreen_(lv_obj_t* obj, lv_event_t event) {
     gp_mainScreen->handleShowScreen_(event, DEN_LIST_SCREEN);
 }
 
