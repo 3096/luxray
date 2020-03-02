@@ -42,7 +42,7 @@ class TimeScreen : public Screen {
         BUTTON_RESET = 19
     };
 
-    static constexpr int MAX_TARGET_CHANGE = 99999;
+    static constexpr int MAX_TARGET_CHANGE = 999999;
 
     // ui
     std::unique_ptr<TimeTaskHandler> mp_timeTaskHandler;

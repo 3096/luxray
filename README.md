@@ -36,27 +36,12 @@ Building
 To-do list:
 ---
 
-- 0.1.1
-  - Add main screen
-  - Add time settings screen
-    - "auto reset after step" could be moved to the settings page
-    - make step interval configurable
-  - Switch between DOCKED/HANDHELD without the launcher under one unified build target
+See [Projects](https://github.com/3096/luxray/projects)
 
-- 0.2.0
-  - Info display (reference capture sight?)
-    - pokemon info/seed/stuff 
 
-- somewhere down the line
-  - Refactor style code
-  - Refactor Makefile
-    - Also make sysmodule/tesla menu build mode output to different build dir
-  - Launcher checks for update
-    - Maybe a canary update channel?
-  - Add lv_btnm edge roll over
-  - Better adhere to GPL
-    - Add copyright headers to source files
-    - Add license to binaries
-  - Routine automation (botbase style?)
-    - Host a service for commands over network
-    - Simple script engine
+Release Plan:
+---
+
+- 0.1.1 - Render, UI, and Date Advance improvements
+- 0.2.0 - Info display  
+- 0.3.0 - Game play automation
