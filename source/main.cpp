@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
     delete gp_overlay;
 
 #ifdef TESLA
-    envSetNextLoad("sdmc:/switch/.overlays/ovlmenu.ovl", "--initial-load");
+    envSetNextLoad("sdmc:/switch/.overlays/ovlmenu.ovl", "--skipCombo");
 #endif
 
     LOG("Main exit");
