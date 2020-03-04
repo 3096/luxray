@@ -16,8 +16,6 @@ void __appInit(void);
 void __appExit(void);
 }
 
-Overlay* gp_overlay;
-
 void __libnx_initheap(void) {
     extern char* fake_heap_start;
     extern char* fake_heap_end;
@@ -25,16 +23,28 @@ void __libnx_initheap(void) {
     fake_heap_end = nx_inner_heap + sizeof(nx_inner_heap);
 }
 
+bool g_appInitSuccessful;
 void __appInit(void) {
-    // Init/exit services
+    g_appInitSuccessful = true;
+
+    // Init services
     Result rc;
     if (R_FAILED(smInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_SM));
     if (R_FAILED(hidInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_HID));
     if (R_FAILED(fsInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_FS));
     if (R_FAILED(rc = setsysInitialize())) fatalThrow(rc);
     if (R_FAILED(rc = nifmInitialize(NifmServiceType_User))) fatalThrow(rc);
+    if (R_FAILED(timeInitialize())) {
+        g_appInitSuccessful = false;  // timeInitialize TimeServiceType_System has failed in the past, so just in case
+        __nx_time_service_type = TimeServiceType_User;
+        if (R_FAILED(rc = timeInitialize())) fatalThrow(rc);
+    }
+    __libnx_init_time();
 
     fsdevMountSdmc();
+    debugInit();
+
+    LOG("service init");
 }
 
 void __appExit(void) {
@@ -46,28 +56,25 @@ void __appExit(void) {
     fsExit();
     hidExit();
     smExit();
-}
-
-int main(int argc, char* argv[]) {
-    if (R_FAILED(timeInitialize())) {
-        return MAKERESULT(Module_Libnx, LibnxError_InitFail_Time);
-    }
-    __libnx_init_time();
-    debugInit();
-    LOG("Main start");
-
-    try {
-        gp_overlay = new Overlay();
-        gp_overlay->run();
-    } catch (std::runtime_error& e) {
-        LOG("runtime_error: %s", e.what());
-    }
-
-    delete gp_overlay;
 
 #ifdef TESLA
     envSetNextLoad("sdmc:/switch/.overlays/ovlmenu.ovl", "--skipCombo");
 #endif
+}
+
+int main(int argc, char* argv[]) {
+    if (not g_appInitSuccessful) {
+        LOG("__appInit failed");
+        return -1;
+    }
+
+    LOG("Main start");
+
+    try {
+        Overlay::run();
+    } catch (std::runtime_error& e) {
+        LOG("runtime_error: %s", e.what());
+    }
 
     LOG("Main exit");
     debugExit();

@@ -5,8 +5,6 @@
 
 #include "screen.hpp"
 
-extern Overlay* gp_overlay;
-
 Screen::Screen(Screen* prevScreen)
     : mp_prevScreen(prevScreen),
       m_ScreenIsJustToggled(false),
@@ -36,7 +34,7 @@ void Screen::show() {
             if (m_screenIsOn) {
                 lv_obj_invalidate(mp_screenObj);  // Re-render screen
             } else {
-                gp_overlay->flushEmptyFb();  // Turn off screen
+                Overlay::flushEmptyFb();  // Turn off screen
             }
         } else if (m_ScreenIsJustToggled and not screenToggleKeysPressed) {
             m_ScreenIsJustToggled = false;

@@ -9,7 +9,7 @@
 
 extern "C" u64 __nx_vi_layer_id;
 
-extern Overlay* gp_overlay;
+Overlay Overlay::s_instance;
 extern MainScreen* gp_mainScreen;
 
 lv_indev_t* gp_keyIn;
@@ -104,10 +104,10 @@ void Overlay::copyPrivFb_() {
 }
 
 void Overlay::flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvColor) {
-    if (not gp_overlay->m_doRender) {
+    if (not s_instance.m_doRender) {
         return;
     }
-    Framebuffer* p_fbInfo = gp_overlay->getFbInfo_();
+    Framebuffer* p_fbInfo = s_instance.getFbInfo_();
     lv_color_t* p_frameBuf = (lv_color_t*)framebufferBegin(p_fbInfo, nullptr);
 
 #if USE_LINEAR_BUF
@@ -117,7 +117,7 @@ void Overlay::flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_co
         p_lvColor += renderWidth;
     }
 #else
-    gp_overlay->copyPrivFb_();
+    s_instance.copyPrivFb_();
 
     // https://github.com/switchbrew/libnx/blob/v1.6.0/nx/include/switch/display/gfx.h#L106-L119
     for (int y = p_area->y1; y <= p_area->y2; y++) {
@@ -138,9 +138,9 @@ void Overlay::flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_co
 }
 
 void Overlay::flushEmptyFb() {
-    void* p_frameBuf = framebufferBegin(&m_frameBufferInfo, nullptr);
-    std::memset(p_frameBuf, 0, m_frameBufferInfo.fb_size);
-    framebufferEnd(&m_frameBufferInfo);
+    void* p_frameBuf = framebufferBegin(&s_instance.m_frameBufferInfo, nullptr);
+    std::memset(p_frameBuf, 0, s_instance.m_frameBufferInfo.fb_size);
+    framebufferEnd(&s_instance.m_frameBufferInfo);
 }
 
 bool Overlay::touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {

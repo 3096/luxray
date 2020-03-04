@@ -11,7 +11,12 @@ extern lv_indev_t* gp_keyIn;
 extern lv_indev_t* gp_touchIn;
 
 class Overlay {
-   public:
+   private:
+    Overlay();
+    Overlay(const Overlay&) = delete;
+    ~Overlay();
+    static Overlay s_instance;
+
     static constexpr const uint16_t SCREEN_WIDTH = 1920;
     static constexpr const uint16_t SCREEN_HEIGHT = 1080;
     static constexpr const uint16_t SCREEN_WIDTH_HANDHELD = 1280;
@@ -43,13 +48,11 @@ class Overlay {
     static bool keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
 
    public:
-    Overlay();
-    ~Overlay();
+    static void run();
 
-    void run();
-    inline void pauseRendering() { m_doRender = false; }
-    inline void resumeRendering() { m_doRender = true; }
-    inline void toggleRendering() { m_doRender = !m_doRender; }
-    inline bool isRendering() { return m_doRender; }
-    void flushEmptyFb();
+    static inline void pauseRendering() { s_instance.m_doRender = false; }
+    static inline void resumeRendering() { s_instance.m_doRender = true; }
+    // static inline void toggleRendering() { s_instance.m_doRender = !m_doRender; }  // unused
+    // static inline bool isRendering() { s_instance.return m_doRender; }  // unused
+    static void flushEmptyFb();
 };

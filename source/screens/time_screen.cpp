@@ -9,7 +9,6 @@
 extern lv_indev_t* gp_keyIn;
 extern lv_indev_t* gp_touchIn;
 
-extern Overlay* gp_overlay;
 extern TimeScreen* gp_timeScreen;
 
 TimeScreen::TimeScreen(Screen* prevScreen)
@@ -49,7 +48,7 @@ TimeScreen::TimeScreen(Screen* prevScreen)
 TimeScreen::~TimeScreen() {}
 
 bool TimeScreen::procFrame_() {
-    gp_overlay->pauseRendering();  // lv tries to draw text before it knows where, smh
+    Overlay::pauseRendering();  // lv tries to draw text before it knows where, smh
 
     // handle task, needed every frame
     mp_timeTaskHandler->handleTask();
@@ -73,7 +72,7 @@ bool TimeScreen::procFrame_() {
         m_internetIsConnected = !m_internetIsConnected;
     }
 
-    gp_overlay->resumeRendering();
+    Overlay::resumeRendering();
     return Screen::procFrame_() or m_isInStepDays;
 }
 
