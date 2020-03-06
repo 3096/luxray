@@ -27,6 +27,7 @@ MainScreen::MainScreen() : Screen(nullptr), m_screenToShow(NO_SUB_SCREEN), m_sho
 MainScreen::~MainScreen() { delete gp_timeScreen; }
 
 bool MainScreen::procFrame_() {
+    // TODO: this needs to be refactored to a screen manager
     switch (m_screenToShow) {
         case TIME_SCREEN:
             if (os::setsysInternetTimeSyncIsOn()) {

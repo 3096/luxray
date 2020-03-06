@@ -32,15 +32,16 @@ void __appInit(void) {
     if (R_FAILED(smInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_SM));
     if (R_FAILED(hidInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_HID));
     if (R_FAILED(fsInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_FS));
-    if (R_FAILED(rc = setsysInitialize())) fatalThrow(rc);
-    if (R_FAILED(rc = nifmInitialize(NifmServiceType_User))) fatalThrow(rc);
     if (R_FAILED(timeInitialize())) {
         g_appInitSuccessful = false;  // timeInitialize TimeServiceType_System has failed in the past, so just in case
         __nx_time_service_type = TimeServiceType_User;
-        if (R_FAILED(rc = timeInitialize())) fatalThrow(rc);
+        if (R_FAILED(rc = timeInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_Time));
     }
-    __libnx_init_time();
+    if (R_FAILED(rc = apmInitialize())) fatalThrow(rc);
+    if (R_FAILED(rc = setsysInitialize())) fatalThrow(rc);
+    if (R_FAILED(rc = nifmInitialize(NifmServiceType_User))) fatalThrow(rc);
 
+    __libnx_init_time();
     fsdevMountSdmc();
     debugInit();
 
@@ -52,6 +53,7 @@ void __appExit(void) {
     fsdevUnmountAll();
     nifmExit();
     setsysExit();
+    apmExit();
     timeExit();
     fsExit();
     hidExit();

@@ -23,24 +23,24 @@ Overlay::Overlay() {
     TRY_GOTO(viCreateLayer(&m_viDisplay, &m_viLayer), close_managed_layer);
     TRY_GOTO(viSetLayerScalingMode(&m_viLayer, ViScalingMode_FitToLayer), close_managed_layer);
     TRY_GOTO(viSetLayerZ(&m_viLayer, 100), close_managed_layer);  // Arbitrary z index
-    TRY_GOTO(viSetLayerSize(&m_viLayer, OVERLAY_WIDTH_BASE * OVERLAY_SCALE, OVERLAY_HEIGHT_BASE * OVERLAY_SCALE),
+    TRY_GOTO(viSetLayerSize(&m_viLayer, LAYER_BASE_WIDTH, LAYER_BASE_HEIGHT), close_managed_layer);
+    TRY_GOTO(viSetLayerPosition(&m_viLayer, getCurLayerInfo_()->POS_X, getCurLayerInfo_()->POS_Y),
              close_managed_layer);
-    TRY_GOTO(viSetLayerPosition(&m_viLayer, OVERLAY_POS_X, OVERLAY_POS_Y), close_managed_layer);
     TRY_GOTO(nwindowCreateFromLayer(&m_nWindow, &m_viLayer), close_managed_layer);
-    TRY_GOTO(
-        framebufferCreate(&m_frameBufferInfo, &m_nWindow, OVERLAY_WIDTH, OVERLAY_HEIGHT, PIXEL_FORMAT_BGRA_8888, 2),
-        close_window);
+    TRY_GOTO(framebufferCreate(&m_frameBufferInfo, &m_nWindow, LAYER_BASE_WIDTH, LAYER_BASE_HEIGHT,
+                               PIXEL_FORMAT_BGRA_8888, 2),
+             close_window);
 #if USE_LINEAR_BUF
     TRY_GOTO(framebufferMakeLinear(&m_frameBufferInfo), close_fb);
 #endif
     mp_frameBuffers[0] = m_frameBufferInfo.buf;
-    mp_frameBuffers[1] = (lv_color_t*)m_frameBufferInfo.buf + OVERLAY_BUF_LENGTH;
+    mp_frameBuffers[1] = (lv_color_t*)m_frameBufferInfo.buf + LAYER_BUF_LENGTH;
 
     LOG("libnx initialized");
 
     lv_init();
     lv_disp_drv_init(&m_dispDrv);
-    lv_disp_buf_init(&m_dispBufferInfo, mp_renderBuf, nullptr, OVERLAY_BUF_LENGTH);
+    lv_disp_buf_init(&m_dispBufferInfo, mp_renderBuf, nullptr, LAYER_BUF_LENGTH);
     m_dispDrv.buffer = &m_dispBufferInfo;
     m_dispDrv.flush_cb = flushBuffer_;
     lv_disp_drv_register(&m_dispDrv);
@@ -122,7 +122,7 @@ void Overlay::flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_co
     // https://github.com/switchbrew/libnx/blob/v1.6.0/nx/include/switch/display/gfx.h#L106-L119
     for (int y = p_area->y1; y <= p_area->y2; y++) {
         for (int x = p_area->x1; x <= p_area->x2; x++) {
-            u32 swizzledPos = ((y & 127) / 16) + (x / 16 * 8) + ((y / 16 / 8) * (OVERLAY_WIDTH / 16 * 8));
+            u32 swizzledPos = ((y & 127) / 16) + (x / 16 * 8) + ((y / 16 / 8) * (LAYER_BASE_WIDTH / 16 * 8));
             swizzledPos *= 16 * 16 * 4;
             swizzledPos += ((y % 16) / 8) * 512 + ((x % 16) / 8) * 256 + ((y % 8) / 2) * 64 + ((x % 8) / 4) * 32 +
                            (y % 2) * 16 + (x % 4) * 4;
@@ -144,20 +144,21 @@ void Overlay::flushEmptyFb() {
 }
 
 bool Overlay::touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
-    /*Save the state and save the pressed coordinate*/
-    data->state = hidTouchCount() > 0 ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
-    if (data->state == LV_INDEV_STATE_PR) {
+    if (hidTouchCount() > 0) {
+        data->state = LV_INDEV_STATE_PR;
         touchPosition touch;
         hidTouchRead(&touch, 0);
-#ifdef HANDHELD
-        data->point.x = touch.px - OVERLAY_POS_X;
-        data->point.y = touch.py - OVERLAY_POS_Y;
-#else
-        data->point.x = touch.px * SCREEN_WIDTH / SCREEN_WIDTH_HANDHELD - OVERLAY_POS_X;
-        data->point.y = touch.py * SCREEN_HEIGHT / SCREEN_HEIGHT_HANDHELD - OVERLAY_POS_Y;
-#endif
+        const LayerInfo* p_curLayerInfo = s_instance.getCurLayerInfo_();
+        if (isDocked_()) {
+            data->point.x = touch.px - p_curLayerInfo->POS_X;
+            data->point.y = touch.py - p_curLayerInfo->POS_Y;
+        } else {
+            data->point.x = touch.px * DOCK_HANDHELD_PIXEL_RATIO - p_curLayerInfo->POS_X;
+            data->point.y = touch.py * DOCK_HANDHELD_PIXEL_RATIO - p_curLayerInfo->POS_Y;
+        }
+    } else {
+        data->state = LV_INDEV_STATE_REL;
     }
-
     return false; /*Return `false` because we are not buffering and no more data to read*/
 }
 
@@ -198,4 +199,10 @@ bool Overlay::keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
     //     LV_KEY_END = 3,       /*0x03, ETX*/
 
     return false;
+}
+
+bool Overlay::isDocked_() {
+    ApmPerformanceMode curPerformanceMode;
+    TRY_THROW(apmGetPerformanceMode(&curPerformanceMode));
+    return curPerformanceMode == ApmPerformanceMode_Docked;
 }

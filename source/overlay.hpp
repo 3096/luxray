@@ -5,6 +5,7 @@
 #include <switch.h>
 
 #include "config.h"
+#include "layer_info.h"
 #include "screens/main_screen.hpp"
 
 extern lv_indev_t* gp_keyIn;
@@ -17,12 +18,17 @@ class Overlay {
     ~Overlay();
     static Overlay s_instance;
 
-    static constexpr const uint16_t SCREEN_WIDTH = 1920;
-    static constexpr const uint16_t SCREEN_HEIGHT = 1080;
-    static constexpr const uint16_t SCREEN_WIDTH_HANDHELD = 1280;
-    static constexpr const uint16_t SCREEN_HEIGHT_HANDHELD = 720;
+    struct LayerInfo {
+        const uint16_t WIDTH;
+        const uint16_t HEIGHT;
+        const uint16_t POS_X;
+        const uint16_t POS_Y;
+    };
 
-    static constexpr const size_t OVERLAY_BUF_LENGTH = OVERLAY_WIDTH * OVERLAY_HEIGHT;
+    static constexpr LayerInfo DOCKED_LAYER_INFO = {LAYER_INFO_DOCKED_WIDTH, LAYER_INFO_DOCKED_HEIGHT, OVERLAY_POS_X_DOCKED,
+                                                    OVERLAY_POS_Y_DOCKED};
+    static constexpr LayerInfo HANDHELD_LAYER_INFO = {LAYER_INFO_HANDHELD_WIDTH, LAYER_INFO_HANDHELD_HEIGHT, OVERLAY_POS_X_HANDHELD,
+                                                      OVERLAY_POS_Y_HANDHELD};
 
     ViDisplay m_viDisplay;
     ViLayer m_viLayer;
@@ -31,7 +37,7 @@ class Overlay {
 
     lv_disp_drv_t m_dispDrv;
     lv_disp_buf_t m_dispBufferInfo;
-    lv_color_t mp_renderBuf[OVERLAY_BUF_LENGTH];
+    lv_color_t mp_renderBuf[LAYER_BUF_LENGTH];
     void* mp_frameBuffers[2];
     bool m_doRender;
 
@@ -42,10 +48,15 @@ class Overlay {
 
     inline Framebuffer* getFbInfo_();
     inline void copyPrivFb_();
+    inline const LayerInfo* getCurLayerInfo_() {
+        // temp
+        return isDocked_() ? &DOCKED_LAYER_INFO : &HANDHELD_LAYER_INFO;
+    }
 
     static void flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvBuffer);
     static bool touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
     static bool keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
+    static bool isDocked_();  // TODO: move all render related function to screen, including this one
 
    public:
     static void run();

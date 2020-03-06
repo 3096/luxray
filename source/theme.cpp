@@ -20,11 +20,6 @@ lv_theme_t* getTheme() {
     theme->style.btnm.bg->body.shadow.color = lv_color_hex(0x707070);
     theme->style.btnm.btn.rel->body.border.color = lv_color_hex(0x707070);
     theme->style.btnm.btn.rel->text.color = LV_COLOR_WHITE;
-#ifdef HANDHELD
-    theme->style.btnm.btn.rel->text.font = &lv_font_roboto_22;
-#else
-    theme->style.btnm.btn.rel->text.font = &lv_font_roboto_16;
-#endif
     theme->style.btnm.btn.pr->body = theme->style.btnm.btn.rel->body;
     theme->style.btnm.btn.pr->body.main_color = lv_color_hex(0x607D8B);
     theme->style.btnm.btn.pr->body.grad_color = lv_color_hex(0x607D8B);

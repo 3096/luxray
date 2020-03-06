@@ -14,15 +14,15 @@
 /* clang-format off */
 
 #include <stdint.h>
-#include "config.h"
+#include "layer_info.h"
 
 /*====================
    Graphical settings
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#define LV_HOR_RES_MAX          OVERLAY_WIDTH
-#define LV_VER_RES_MAX          OVERLAY_HEIGHT
+#define LV_HOR_RES_MAX          LAYER_BASE_WIDTH
+#define LV_VER_RES_MAX          LAYER_BASE_HEIGHT
 
 /* Color depth:
  * - 1:  1 byte per pixel
@@ -57,7 +57,7 @@
 /* Dot Per Inch: used to initialize default sizes.
  * E.g. a button with width = LV_DPI / 2 -> half inch wide
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
-#define LV_DPI              OVERLAY_DPI     /*[px]*/
+#define LV_DPI              100     /*[px]*/
 
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
 typedef int16_t lv_coord_t;
@@ -325,7 +325,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 #define LV_FONT_CUSTOM_DECLARE
 
 /*Always set a default font from the built-in fonts*/
-#define LV_FONT_DEFAULT        &OVERLAY_FONT
+#define LV_FONT_DEFAULT        &lv_font_roboto_22
 
 /* Enable it if you have fonts with a lot of characters.
  * The limit depends on the font size, font face and bpp
