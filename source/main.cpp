@@ -1,6 +1,7 @@
 #include "debug.hpp"
 #include "lvgl/lvgl.h"
-#include "overlay.hpp"
+#include "ui/controller.hpp"
+#include "screens/main_screen.hpp"
 #include "util.hpp"
 
 extern "C" {
@@ -73,8 +74,8 @@ int main(int argc, char* argv[]) {
     LOG("Main start");
 
     try {
-        Overlay::run();
-    } catch (std::runtime_error& e) {
+        ui::Controller::show(MainScreen::getInstance());
+        } catch (std::runtime_error& e) {
         LOG("runtime_error: %s", e.what());
     }
 

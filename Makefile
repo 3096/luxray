@@ -44,7 +44,7 @@ APP_VERSION	:=	w0.1.0
 
 TARGET		:=	luxray
 BUILD		:=	build
-SOURCES		:=	source source/screens source/lvgl/src/lv_core source/lvgl/src/lv_draw source/lvgl/src/lv_font source/lvgl/src/lv_hal source/lvgl/src/lv_misc source/lvgl/src/lv_objx source/lvgl/src/lv_themes source/core # temporary until I learn a better way to do this...
+SOURCES		:=	source source/screens source/lvgl/src/lv_core source/lvgl/src/lv_draw source/lvgl/src/lv_font source/lvgl/src/lv_hal source/lvgl/src/lv_misc source/lvgl/src/lv_objx source/lvgl/src/lv_themes source/core source/ui # temporary until I learn a better way to do this...
 DATA		:=	data
 INCLUDES	:=	include
 #ROMFS	:=	romfs
@@ -68,7 +68,7 @@ ASFLAGS		:=	-g $(ARCH)
 
 LDFLAGS		:=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS		:=	-lnx
+LIBS		:=	-lnx -lstratosphere
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

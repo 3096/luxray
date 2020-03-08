@@ -1,36 +1,39 @@
 #pragma once
 
-#include "screen.hpp"
-#include "time_error_screen.hpp"
+#include "../ui/i_screen.hpp"
+#include "../ui/screen_composition.hpp"
 
-class MainScreen;
-extern MainScreen* gp_mainScreen;
-
-class MainScreen : public Screen {
+class MainScreen : public IScreen {
    private:
-    std::unique_ptr<TimeErrorScreen> mp_timeErrorScreen;
-
-    lv_obj_t* mp_screenListObj;
+    MainScreen();
+    MainScreen(const MainScreen&) = delete;
+    ~MainScreen();
+    static MainScreen s_instance;
 
     enum SubScreen { TIME_SCREEN = 0, NO_SUB_SCREEN };
+    
+    lv_obj_t* mp_screenListObj;
 
     SubScreen m_screenToShow;
+    bool m_shouldExit;
 
-    bool m_shouldContinue;
+    BasicScreen m_basicScreen;
 
-    virtual bool procFrame_();
+    virtual void procFrame();
 
+    virtual inline lv_obj_t* getLvScreenObj() { return m_basicScreen.getLvScreenObj(); }
+    virtual inline lv_group_t* getLvInputGroup() { return m_basicScreen.getLvInputGroup(); }
+
+    // helpers
+    void showScreen_(IScreen& screenToShow);
     void handleShowScreen_(lv_event_t event, SubScreen screenToShow);
-    static inline void handleShowTimeScreen_(lv_obj_t* obj, lv_event_t event) {
-#ifndef __INTELLISENSE__  // IntelliSense strikes again, doesn't recognize forward definition properly
-        gp_mainScreen->handleShowScreen_(event, TIME_SCREEN);
-#endif
-    }
 
-    void handleExitImpl_();
+    // callbacks
+    static void handleShowTimeScreen_(lv_obj_t* obj, lv_event_t event) {
+        s_instance.handleShowScreen_(event, TIME_SCREEN);
+    }
     static void handleExit_(lv_obj_t* obj, lv_event_t event);
 
    public:
-    MainScreen();
-    ~MainScreen();
+    static inline MainScreen& getInstance() { return s_instance; }
 };

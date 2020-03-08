@@ -2,47 +2,50 @@
 
 #include "../core/system.hpp"
 #include "../debug.hpp"
+#include "../ui/controller.hpp"
+#include "time_error_screen.hpp"
 #include "time_screen.hpp"
 
 #include "main_screen.hpp"
 
-MainScreen* gp_mainScreen;
-TimeScreen* gp_timeScreen;
+MainScreen MainScreen::s_instance;
 
-MainScreen::MainScreen() : Screen(nullptr), m_screenToShow(NO_SUB_SCREEN), m_shouldContinue(true) {
-    gp_timeScreen = new TimeScreen(this);
-    mp_timeErrorScreen = std::make_unique<TimeErrorScreen>(this);
-
+MainScreen::MainScreen() : m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
     // list of buttons to different screens
-    mp_screenListObj = lv_list_create(mp_screenObj, nullptr);
+    mp_screenListObj = lv_list_create(getLvScreenObj(), nullptr);
     lv_obj_align(mp_screenListObj, nullptr, LV_ALIGN_CENTER, 0, 0);
 
     // TODO: refactor the strings here
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Date Advance"), handleShowTimeScreen_);
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Exit"), handleExit_);
 
-    lv_group_add_obj(mp_inputGroup, mp_screenListObj);
+    lv_group_add_obj(getLvInputGroup(), mp_screenListObj);
 }
 
-MainScreen::~MainScreen() { delete gp_timeScreen; }
+MainScreen::~MainScreen() {}
 
-bool MainScreen::procFrame_() {
-    // TODO: this needs to be refactored to a screen manager
+void MainScreen::procFrame() {
     switch (m_screenToShow) {
         case TIME_SCREEN:
             if (os::setsysInternetTimeSyncIsOn()) {
-                gp_timeScreen->show();
+                showScreen_(TimeScreen::getInstance());
             } else {
-                mp_timeErrorScreen->show();
+                showScreen_(TimeErrorScreen::getInstance());
             }
             break;
         default:
-            return m_shouldContinue;
+            break;
     }
 
+    if (m_shouldExit) {
+        ui::Controller::stop();
+    }
+}
+
+void MainScreen::showScreen_(IScreen& screenToShow) {
+    ui::Controller::show(screenToShow);
     // remove m_screenToShow to show main screen again
     m_screenToShow = NO_SUB_SCREEN;
-    return m_shouldContinue;
 }
 
 void MainScreen::handleShowScreen_(lv_event_t event, SubScreen screenToShow) {
@@ -51,12 +54,8 @@ void MainScreen::handleShowScreen_(lv_event_t event, SubScreen screenToShow) {
     }
 }
 
-void MainScreen::handleExitImpl_() {
-    m_shouldContinue = false;  // TODO: add confirm message box or something
-}
-
 void MainScreen::handleExit_(lv_obj_t* obj, lv_event_t event) {
     if (event == LV_EVENT_CLICKED) {
-        gp_mainScreen->handleExitImpl_();
+        s_instance.m_shouldExit = true;
     }
 }

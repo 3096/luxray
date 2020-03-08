@@ -3,17 +3,14 @@
 #include "../core/system.hpp"
 #include "../debug.hpp"
 #include "../overlay.hpp"
+#include "../ui/controller.hpp"
 
 #include "time_screen.hpp"
 
-extern lv_indev_t* gp_keyIn;
-extern lv_indev_t* gp_touchIn;
+TimeScreen TimeScreen::s_instance;
 
-extern TimeScreen* gp_timeScreen;
-
-TimeScreen::TimeScreen(Screen* prevScreen)
-    : Screen(prevScreen),
-      mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
+TimeScreen::TimeScreen()
+    : mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
       m_doAutoReset(true),
       m_isInStepDays(false),
       m_isAlreadyNTP(false),
@@ -21,7 +18,7 @@ TimeScreen::TimeScreen(Screen* prevScreen)
       m_internetIsConnected(false),
       m_curTargetChange(0),
       m_curTargetSign(1) {
-    lv_obj_t* p_window = lv_win_create(mp_screenObj, nullptr);
+    lv_obj_t* p_window = lv_win_create(getLvScreenObj(), nullptr);
     lv_win_set_title(p_window, "  Date Advance");
 
     mp_promptLabel = lv_label_create(p_window, nullptr);
@@ -40,14 +37,14 @@ TimeScreen::TimeScreen(Screen* prevScreen)
     lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
     lv_obj_set_event_cb(mp_buttonMatrix, handleButtonEvent_);
 
-    lv_group_add_obj(mp_inputGroup, mp_buttonMatrix);
+    lv_group_add_obj(getLvInputGroup(), mp_buttonMatrix);
 
     updateLabels_();
 }
 
 TimeScreen::~TimeScreen() {}
 
-bool TimeScreen::procFrame_() {
+void TimeScreen::procFrame() {
     Overlay::pauseRendering();  // lv tries to draw text before it knows where, smh
 
     // handle task, needed every frame
@@ -73,7 +70,10 @@ bool TimeScreen::procFrame_() {
     }
 
     Overlay::resumeRendering();
-    return Screen::procFrame_() or m_isInStepDays;
+
+    if (m_basicScreen.returnButtonPressed() and not m_isInStepDays) {
+        ui::Controller::show(MainScreen::getInstance());
+    }
 }
 
 void TimeScreen::handleButtonEventImpl_() {
@@ -151,7 +151,7 @@ void TimeScreen::handleButtonEventImpl_() {
 
 void TimeScreen::handleButtonEvent_(lv_obj_t* btnm, lv_event_t event) {
     if (event == LV_EVENT_CLICKED) {
-        gp_timeScreen->handleButtonEventImpl_();
+        s_instance.handleButtonEventImpl_();
     }
 }
 

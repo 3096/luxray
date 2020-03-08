@@ -28,3 +28,9 @@ bool os::setsysInternetTimeSyncIsOn() {
 
     return internetTimeSyncIsOn;
 }
+
+bool os::apmConsoleIsDocked() {
+    ApmPerformanceMode curPerformanceMode;
+    TRY_THROW(apmGetPerformanceMode(&curPerformanceMode));
+    return curPerformanceMode == ApmPerformanceMode_Docked;
+}

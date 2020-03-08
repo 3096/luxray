@@ -10,7 +10,6 @@
 extern "C" u64 __nx_vi_layer_id;
 
 Overlay Overlay::s_instance;
-extern MainScreen* gp_mainScreen;
 
 lv_indev_t* gp_keyIn;
 lv_indev_t* gp_touchIn;
@@ -59,10 +58,6 @@ Overlay::Overlay() {
 
     LOG("lv initialized");
 
-    gp_mainScreen = new MainScreen();
-
-    LOG("screens initialized");
-
     m_doRender = true;
     return;
 
@@ -85,18 +80,12 @@ end:
 Overlay::~Overlay() {
     LOG("Exit Overlay");
 
-    delete gp_mainScreen;
-
     framebufferClose(&m_frameBufferInfo);
     nwindowClose(&m_nWindow);
     viDestroyManagedLayer(&m_viLayer);
     viCloseDisplay(&m_viDisplay);
     viExit();
 }
-
-void Overlay::run() { gp_mainScreen->show(); }
-
-Framebuffer* Overlay::getFbInfo_() { return &m_frameBufferInfo; }
 
 void Overlay::copyPrivFb_() {
     std::memcpy(mp_frameBuffers[m_nWindow.cur_slot], mp_frameBuffers[m_nWindow.cur_slot ^ 1],
@@ -107,7 +96,7 @@ void Overlay::flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_co
     if (not s_instance.m_doRender) {
         return;
     }
-    Framebuffer* p_fbInfo = s_instance.getFbInfo_();
+    Framebuffer* p_fbInfo = &s_instance.m_frameBufferInfo;
     lv_color_t* p_frameBuf = (lv_color_t*)framebufferBegin(p_fbInfo, nullptr);
 
 #if USE_LINEAR_BUF

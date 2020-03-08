@@ -3,22 +3,30 @@
 #include <memory>
 
 #include "../core/time.hpp"
-#include "screen.hpp"
+#include "../ui/i_screen.hpp"
+#include "../ui/screen_composition.hpp"
 
-class TimeScreen : public Screen {
+class TimeScreen : public IScreen {
    private:
+    TimeScreen();
+    TimeScreen(const TimeScreen&) = delete;
+    ~TimeScreen();
+    static TimeScreen s_instance;
+
     // consts
     static constexpr const char* STRING_CUR_DATE = "Current Date:";
     // static constexpr const char* STRING_TARGET_DATE = "Target Date:";
     static constexpr const char* STRING_TARGET_CHANGE = "Target Change:";
     static constexpr const char* STRING_STEPPING = "Step Remaining:";
     static constexpr const char* STRING_DAYS = " days";
+    // clang-format off
     static constexpr const char* INITIAL_BUTTON_MAP[] = {
-        "1", "2", "3", "Set", "+1", "\n",
-        "4", "5", "6", "Step", "+2", "\n",
-        "7", "8", "9", "NTP", "+3", "\n",
+        "1", "2", "3",  "Set",    "+1",    "\n",
+        "4", "5", "6",  "Step",   "+2",    "\n",
+        "7", "8", "9",  "NTP",    "+3",    "\n",
         "-", "0", "<-", "Return", "Reset", ""
     };
+    // clang-format on
     static constexpr const uint16_t STEP_MAP_IDX = 9;
     static constexpr const char* STRING_STEP = INITIAL_BUTTON_MAP[STEP_MAP_IDX];
     static constexpr const char* STRING_STEP_CANCEL = "Cancel";
@@ -64,6 +72,9 @@ class TimeScreen : public Screen {
     std::string m_promptLabelStr;
     std::string m_valueLabelStr;
 
+    // composition
+    BasicScreen m_basicScreen;
+
     // helpers
     void handleButtonEventImpl_();
     static void handleButtonEvent_(lv_obj_t* obj, lv_event_t event);
@@ -71,10 +82,12 @@ class TimeScreen : public Screen {
     void handleStepDaysEnd_();
     void updateLabels_();
 
-    // poly
-    virtual bool procFrame_();
+    // interface
+    virtual void procFrame();
+
+    virtual inline lv_obj_t* getLvScreenObj() { return m_basicScreen.getLvScreenObj(); }
+    virtual inline lv_group_t* getLvInputGroup() { return m_basicScreen.getLvInputGroup(); }
 
    public:
-    TimeScreen(Screen* prevScreen);
-    ~TimeScreen();
+    static inline TimeScreen& getInstance() { return s_instance; }
 };
