@@ -41,6 +41,7 @@ void __appInit(void) {
     if (R_FAILED(rc = apmInitialize())) fatalThrow(rc);
     if (R_FAILED(rc = setsysInitialize())) fatalThrow(rc);
     if (R_FAILED(rc = nifmInitialize(NifmServiceType_User))) fatalThrow(rc);
+    if (R_FAILED(rc = viInitialize(ViServiceType_Manager))) fatalThrow(rc);
 
     __libnx_init_time();
     fsdevMountSdmc();
@@ -52,6 +53,7 @@ void __appInit(void) {
 void __appExit(void) {
     // Cleanup services.
     fsdevUnmountAll();
+    viExit();
     nifmExit();
     setsysExit();
     apmExit();

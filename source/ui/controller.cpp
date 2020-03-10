@@ -84,7 +84,7 @@ void Controller::threadMain_() {
             break;
         }
 
-        svcSleepThread(10'000'000);
+        Overlay::waitForVSync();
     }
 }
 

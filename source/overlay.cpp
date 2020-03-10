@@ -15,8 +15,8 @@ lv_indev_t* gp_keyIn;
 lv_indev_t* gp_touchIn;
 
 Overlay::Overlay() {
-    TRY_GOTO(viInitialize(ViServiceType_Manager), end);
-    TRY_GOTO(viOpenDefaultDisplay(&m_viDisplay), close_serv);
+    TRY_GOTO(viOpenDefaultDisplay(&m_viDisplay), end);
+    TRY_GOTO(viGetDisplayVsyncEvent(&m_viDisplay, &m_viDisplayVsyncEvent), close_display);
     TRY_GOTO(viCreateManagedLayer(&m_viDisplay, (ViLayerFlags)0, 0, &__nx_vi_layer_id),
              close_display);  // flag 0 allows non-fullscreen layer
     TRY_GOTO(viCreateLayer(&m_viDisplay, &m_viLayer), close_managed_layer);
@@ -71,8 +71,6 @@ close_managed_layer:
     viDestroyManagedLayer(&m_viLayer);
 close_display:
     viCloseDisplay(&m_viDisplay);
-close_serv:
-    viExit();
 end:
     throw std::runtime_error("Overlay init failed");
 }
@@ -194,4 +192,8 @@ bool Overlay::isDocked_() {
     ApmPerformanceMode curPerformanceMode;
     TRY_THROW(apmGetPerformanceMode(&curPerformanceMode));
     return curPerformanceMode == ApmPerformanceMode_Docked;
+}
+
+void Overlay::waitForVSync() {
+    TRY_THROW(eventWait(&s_instance.m_viDisplayVsyncEvent, U64_MAX));
 }

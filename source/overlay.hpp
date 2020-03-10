@@ -35,6 +35,7 @@ class Overlay {
     ViLayer m_viLayer;
     NWindow m_nWindow;
     Framebuffer m_frameBufferInfo;
+    Event m_viDisplayVsyncEvent;
 
     // lvgl members
     lv_disp_drv_t m_dispDrv;
@@ -66,4 +67,5 @@ class Overlay {
     // static inline void toggleRendering() { s_instance.m_doRender = !m_doRender; }  // unused
     // static inline bool isRendering() { s_instance.return m_doRender; }  // unused
     static void flushEmptyFb();
+    static void waitForVSync();
 };
