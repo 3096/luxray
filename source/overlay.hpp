@@ -51,15 +51,12 @@ class Overlay {
     bool m_isDocked;
 
     inline void copyPrivFb_();
-    inline const LayerInfo* getCurLayerInfo_() {
-        // temp
-        return isDocked_() ? &DOCKED_LAYER_INFO : &HANDHELD_LAYER_INFO;
-    }
+    inline const LayerInfo& getCurLayerInfo_() { return m_isDocked ? DOCKED_LAYER_INFO : HANDHELD_LAYER_INFO; }
+    void setIsDockedStatusImpl_(bool isDocked);
 
     static void flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvBuffer);
     static bool touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
     static bool keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
-    static bool isDocked_();  // TODO: move all render related function to screen, including this one
 
    public:
     static inline void pauseRendering() { s_instance.m_doRender = false; }
@@ -68,4 +65,7 @@ class Overlay {
     // static inline bool isRendering() { s_instance.return m_doRender; }  // unused
     static void flushEmptyFb();
     static void waitForVSync();
+
+    static inline bool getIsDockedStatus() { return s_instance.m_isDocked; }
+    static inline void setIsDockedStatus(bool isDocked) { s_instance.setIsDockedStatusImpl_(isDocked); }
 };

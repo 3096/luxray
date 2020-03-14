@@ -6,12 +6,12 @@
 
 #    include "lvgl/lvgl.h"
 
-namespace ams {
-ncm::ProgramId CurrentProgramId = {0x0100000000000195};
-namespace result {
-bool CallFatalOnResultAssertion = true;
-}
-}  // namespace ams
+// namespace ams {
+// ncm::ProgramId CurrentProgramId = {0x0100000000000195};
+// namespace result {
+// bool CallFatalOnResultAssertion = true;
+// }
+// }  // namespace ams
 
 FILE* g_debug_file;
 

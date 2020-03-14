@@ -1,14 +1,14 @@
 #pragma once
 
-// #define DEBUG
+#define DEBUG
 
 #include <switch.h>
 
 #ifdef DEBUG
-#    define ATMOSPHERE_BOARD_NINTENDO_SWITCH
+// #    define ATMOSPHERE_BOARD_NINTENDO_SWITCH
 
-#    include <stratosphere/ams/ams_environment.hpp>
-#    include <stratosphere/ncm/ncm_types.hpp>
+// #    include <stratosphere/ams/ams_environment.hpp>
+// #    include <stratosphere/ncm/ncm_types.hpp>
 
 #    include "util.hpp"
 
@@ -22,8 +22,10 @@ extern FILE* g_debug_file;
 #    else
 #        define LOG(...) ({})
 #    endif
+#    define DEBUG_ASSERT(v) assert(v)
 #else
 #    define LOG(...) ({})
+#    define DEBUG_ASSERT(v) {}
 #endif
 #define LOG32(v) LOG(STRINGIFY(v) " = %d", v)
 #define LOG64(v) LOG(STRINGIFY(v) " = %ld", v)

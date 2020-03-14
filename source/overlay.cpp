@@ -1,6 +1,7 @@
 #include <cstring>
 #include <stdexcept>
 
+#include "core/system.hpp"
 #include "debug.hpp"
 #include "theme.hpp"
 #include "util.hpp"
@@ -23,8 +24,12 @@ Overlay::Overlay() {
     TRY_GOTO(viSetLayerScalingMode(&m_viLayer, ViScalingMode_FitToLayer), close_managed_layer);
     TRY_GOTO(viSetLayerZ(&m_viLayer, 100), close_managed_layer);  // Arbitrary z index
     TRY_GOTO(viSetLayerSize(&m_viLayer, LAYER_BASE_WIDTH, LAYER_BASE_HEIGHT), close_managed_layer);
-    TRY_GOTO(viSetLayerPosition(&m_viLayer, getCurLayerInfo_()->POS_X, getCurLayerInfo_()->POS_Y),
-             close_managed_layer);
+    try {
+        setIsDockedStatusImpl_(os::apmConsoleIsDocked());
+    } catch (std::runtime_error& e) {
+        LOG("%s", e.what());
+        goto close_managed_layer;
+    }
     TRY_GOTO(nwindowCreateFromLayer(&m_nWindow, &m_viLayer), close_managed_layer);
     TRY_GOTO(framebufferCreate(&m_frameBufferInfo, &m_nWindow, LAYER_BASE_WIDTH, LAYER_BASE_HEIGHT,
                                PIXEL_FORMAT_BGRA_8888, 2),
@@ -135,13 +140,13 @@ bool Overlay::touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
         data->state = LV_INDEV_STATE_PR;
         touchPosition touch;
         hidTouchRead(&touch, 0);
-        const LayerInfo* p_curLayerInfo = s_instance.getCurLayerInfo_();
-        if (isDocked_()) {
-            data->point.x = touch.px - p_curLayerInfo->POS_X;
-            data->point.y = touch.py - p_curLayerInfo->POS_Y;
+        const LayerInfo& curLayerInfo = s_instance.getCurLayerInfo_();
+        if (Overlay::getIsDockedStatus()) {
+            data->point.x = touch.px - curLayerInfo.POS_X;
+            data->point.y = touch.py - curLayerInfo.POS_Y;
         } else {
-            data->point.x = touch.px * DOCK_HANDHELD_PIXEL_RATIO - p_curLayerInfo->POS_X;
-            data->point.y = touch.py * DOCK_HANDHELD_PIXEL_RATIO - p_curLayerInfo->POS_Y;
+            data->point.x = touch.px * DOCK_HANDHELD_PIXEL_RATIO - curLayerInfo.POS_X;
+            data->point.y = touch.py * DOCK_HANDHELD_PIXEL_RATIO - curLayerInfo.POS_Y;
         }
     } else {
         data->state = LV_INDEV_STATE_REL;
@@ -188,12 +193,10 @@ bool Overlay::keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
     return false;
 }
 
-bool Overlay::isDocked_() {
-    ApmPerformanceMode curPerformanceMode;
-    TRY_THROW(apmGetPerformanceMode(&curPerformanceMode));
-    return curPerformanceMode == ApmPerformanceMode_Docked;
-}
+void Overlay::waitForVSync() { TRY_THROW(eventWait(&s_instance.m_viDisplayVsyncEvent, U64_MAX)); }
 
-void Overlay::waitForVSync() {
-    TRY_THROW(eventWait(&s_instance.m_viDisplayVsyncEvent, U64_MAX));
+void Overlay::setIsDockedStatusImpl_(bool isDocked) {
+    s_instance.m_isDocked = isDocked;
+    TRY_THROW(viSetLayerPosition(&s_instance.m_viLayer, s_instance.getCurLayerInfo_().POS_X,
+                                 s_instance.getCurLayerInfo_().POS_Y));
 }

@@ -30,7 +30,7 @@ void Controller::mountScreen_(IScreen* screenToMount) {
 
 void Controller::threadMain_() {
     // mount inital screen
-    assert(mp_curScreen);
+    DEBUG_ASSERT(mp_curScreen);
     mountScreen_(mp_curScreen);
 
     // main loop
