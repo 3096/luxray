@@ -59,7 +59,8 @@ Overlay::Overlay() {
     m_keyDrv.read_cb = keysRead_;
     gp_keyIn = lv_indev_drv_register(&m_keyDrv);
 
-    lv_theme_set_current(theme::getTheme());
+    // TODO: fix theme
+    // lv_theme_set_act(theme::getTheme());
 
     LOG("lv initialized");
 
@@ -193,7 +194,7 @@ bool Overlay::keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
     return false;
 }
 
-void Overlay::waitForVSync() { TRY_THROW(eventWait(&s_instance.m_viDisplayVsyncEvent, U64_MAX)); }
+void Overlay::waitForVSync() { TRY_THROW(eventWait(&s_instance.m_viDisplayVsyncEvent, UINT64_MAX)); }
 
 void Overlay::setIsDockedStatusImpl_(bool isDocked) {
     s_instance.m_isDocked = isDocked;

@@ -1,11 +1,11 @@
+#include "time_screen.hpp"
+
 #include <cstring>
 
 #include "../core/system.hpp"
 #include "../debug.hpp"
 #include "../overlay.hpp"
 #include "../ui/controller.hpp"
-
-#include "time_screen.hpp"
 
 TimeScreen TimeScreen::s_instance;
 
@@ -28,18 +28,20 @@ TimeScreen::TimeScreen()
     lv_label_set_align(mp_valueLabel, LV_LABEL_ALIGN_RIGHT);
 
     std::memcpy(m_buttonMap, INITIAL_BUTTON_MAP, sizeof(INITIAL_BUTTON_MAP));
-    mp_buttonMatrix = lv_btnm_create(p_window, NULL);
-    lv_btnm_set_map(mp_buttonMatrix, (const char**)m_buttonMap);
-    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNM_CTRL_TGL_ENABLE);
-    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNM_CTRL_TGL_ENABLE);
-    if (m_doAutoReset) lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNM_CTRL_TGL_STATE);
-    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_INACTIVE);
+    mp_buttonMatrix = lv_btnmatrix_create(p_window, NULL);
+    lv_btnmatrix_set_map(mp_buttonMatrix, (const char**)m_buttonMap);
+    lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNMATRIX_CTRL_CHECKABLE);
+    if (m_doAutoReset) lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNMATRIX_CTRL_CHECK_STATE);
+    lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNMATRIX_CTRL_DISABLED);
     lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
     lv_obj_set_event_cb(mp_buttonMatrix, handleButtonEvent_);
 
     lv_group_add_obj(getLvInputGroup(), mp_buttonMatrix);
 
     updateLabels_();
+
+    LOG("TimeScreen initialized");
 }
 
 TimeScreen::~TimeScreen() {}
@@ -62,9 +64,9 @@ void TimeScreen::procFrame() {
     // stuffs that can run less than every frame, might refactor
     if (not m_disableNTP and m_internetIsConnected != os::nifmInternetIsConnected()) {
         if (m_internetIsConnected) {
-            lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_INACTIVE);
+            lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNMATRIX_CTRL_DISABLED);
         } else {
-            lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_INACTIVE);
+            lv_btnmatrix_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNMATRIX_CTRL_DISABLED);
         }
         m_internetIsConnected = !m_internetIsConnected;
     }
@@ -77,13 +79,13 @@ void TimeScreen::procFrame() {
 }
 
 void TimeScreen::handleButtonEventImpl_() {
-    Button button = (Button)lv_btnm_get_active_btn(mp_buttonMatrix);
+    Button button = (Button)lv_btnmatrix_get_active_btn(mp_buttonMatrix);
 
     if (m_isInStepDays) {  // all other buttons are disabled
         if (button == BUTTON_STEP) {
             mp_timeTaskHandler->stopStepDaysTask();
             // disable step button in case need to wait for auto reset
-            lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_STEP, LV_BTNM_CTRL_INACTIVE);
+            lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_STEP, LV_BTNMATRIX_CTRL_DISABLED);
         }
         return;
     }
@@ -94,7 +96,7 @@ void TimeScreen::handleButtonEventImpl_() {
             m_curTargetChange = 0;
             if (m_curTargetSign != 1) {
                 m_curTargetSign = 1;
-                lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNM_CTRL_TGL_STATE);
+                lv_btnmatrix_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNMATRIX_CTRL_CHECK_STATE);
             }
             return;
         case BUTTON_AUTORESET:
@@ -128,24 +130,24 @@ void TimeScreen::handleButtonEventImpl_() {
             if (m_internetIsConnected and not m_isAlreadyNTP) {
                 try {
                     mp_timeTaskHandler->setTimeNTP();
-                    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_TGL_STATE);
+                    lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNMATRIX_CTRL_CHECK_STATE);
                     m_isAlreadyNTP = true;
                 } catch (std::runtime_error& e) {
-                    lv_btnm_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_INACTIVE);
+                    lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNMATRIX_CTRL_DISABLED);
                     m_disableNTP = true;
                     LOG("NTP runtime_error: %s", e.what());
                 }
             }
             return;
         default:  // number button
-            m_curTargetChange = m_curTargetChange * 10 + (lv_btnm_get_active_btn_text(mp_buttonMatrix)[0] - '0');
+            m_curTargetChange = m_curTargetChange * 10 + (lv_btnmatrix_get_active_btn_text(mp_buttonMatrix)[0] - '0');
             if (m_curTargetChange > MAX_TARGET_CHANGE) {
                 m_curTargetChange = MAX_TARGET_CHANGE;
             }
             return;
     }
     // time is changed from last NTP call
-    lv_btnm_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNM_CTRL_TGL_STATE);
+    lv_btnmatrix_clear_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNMATRIX_CTRL_CHECK_STATE);
     m_isAlreadyNTP = false;
 }
 
@@ -161,11 +163,11 @@ void TimeScreen::handleStepDaysStart_(int8_t stepDirection, int daysToStep) {
     m_buttonMap[STEP_MAP_IDX] = STRING_STEP_CANCEL;
 
     // inactive all buttons
-    lv_btnm_ext_t* btnmExt = (lv_btnm_ext_t*)lv_obj_get_ext_attr(mp_buttonMatrix);
+    lv_btnmatrix_ext_t* btnmExt = (lv_btnmatrix_ext_t*)lv_obj_get_ext_attr(mp_buttonMatrix);
     for (uint16_t i = 0; i < btnmExt->btn_cnt; i++) {
-        btnmExt->ctrl_bits[i] |= LV_BTNM_CTRL_INACTIVE;
+        btnmExt->ctrl_bits[i] |= LV_BTNMATRIX_CTRL_DISABLED;
     }
-    btnmExt->ctrl_bits[BUTTON_STEP] = LV_BTNM_CTRL_TGL_STATE;
+    btnmExt->ctrl_bits[BUTTON_STEP] = LV_BTNMATRIX_CTRL_CHECK_STATE;
     lv_obj_invalidate(mp_buttonMatrix);
 
     m_isInStepDays = true;
@@ -175,13 +177,13 @@ void TimeScreen::handleStepDaysEnd_() {
     m_buttonMap[STEP_MAP_IDX] = STRING_STEP;
 
     // active all buttons
-    lv_btnm_ext_t* btnmExt = (lv_btnm_ext_t*)lv_obj_get_ext_attr(mp_buttonMatrix);
+    lv_btnmatrix_ext_t* btnmExt = (lv_btnmatrix_ext_t*)lv_obj_get_ext_attr(mp_buttonMatrix);
     for (uint16_t i = 0; i < btnmExt->btn_cnt; i++) {
-        btnmExt->ctrl_bits[i] &= ~LV_BTNM_CTRL_INACTIVE;
+        btnmExt->ctrl_bits[i] &= ~LV_BTNMATRIX_CTRL_DISABLED;
     }
     // except NTP button if it's inactive
     if (m_disableNTP or not m_internetIsConnected) {
-        btnmExt->ctrl_bits[BUTTON_NTP] |= LV_BTNM_CTRL_INACTIVE;
+        btnmExt->ctrl_bits[BUTTON_NTP] |= LV_BTNMATRIX_CTRL_DISABLED;
     }
     btnmExt->ctrl_bits[BUTTON_STEP] = 0;  // clear step button's toggle
     lv_obj_invalidate(mp_buttonMatrix);

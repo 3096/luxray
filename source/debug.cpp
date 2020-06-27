@@ -15,9 +15,13 @@
 
 FILE* g_debug_file;
 
-void lvglLog(lv_log_level_t level, const char* path, uint32_t line, const char* description) {
-    fprintf(g_debug_file, "lvgl: level %d - %s:%d: %s\n", level, path, line, description);
+void lvglLog(lv_log_level_t level, const char* filePath, uint32_t lineNum, const char* funcName,
+             const char* description) {
+    fprintf(g_debug_file, "lvgl: level %d - %s:%d: %s %s\n", level, filePath, lineNum, funcName, description);
     fflush(g_debug_file);
+    if (level >= 3) {
+        *(int*)nullptr = 0xB;  // force a crash
+    }
 }
 #endif
 

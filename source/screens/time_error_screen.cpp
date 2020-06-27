@@ -1,7 +1,8 @@
+#include "time_error_screen.hpp"
+
+#include "../debug.hpp"
 #include "../ui/controller.hpp"
 #include "main_screen.hpp"
-
-#include "time_error_screen.hpp"
 
 TimeErrorScreen TimeErrorScreen::s_instance;
 
@@ -13,6 +14,8 @@ TimeErrorScreen::TimeErrorScreen() : IScreen() {
                       "\"Synchronize Clock via\n"
                       "Internet\" in System Settings.");
     lv_obj_align(p_errorMsgLabel, NULL, LV_ALIGN_CENTER, 0, 0);
+
+    LOG("TimeErrorScreen initialized");
 }
 
 TimeErrorScreen::~TimeErrorScreen() {}

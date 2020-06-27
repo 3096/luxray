@@ -20,6 +20,8 @@ MainScreen::MainScreen() : m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Exit"), handleExit_);
 
     lv_group_add_obj(getLvInputGroup(), mp_screenListObj);
+
+    LOG("MainScreen initialized");
 }
 
 MainScreen::~MainScreen() {}

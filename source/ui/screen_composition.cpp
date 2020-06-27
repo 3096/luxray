@@ -1,9 +1,11 @@
-#include "../theme.hpp"
-
 #include "screen_composition.hpp"
 
+#include "../debug.hpp"
+#include "../theme.hpp"
+
 BasicScreen::BasicScreen() : mp_screenObj(lv_obj_create(nullptr, nullptr)), mp_inputGroup(lv_group_create()) {
-    lv_group_set_style_mod_cb(mp_inputGroup, theme::focusStyleMod);
+    // TODO: fix theme
+    // lv_group_set_style_mod_cb(mp_inputGroup, theme::focusStyleMod);
 }
 
 BasicScreen::~BasicScreen() {

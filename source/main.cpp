@@ -1,7 +1,7 @@
 #include "debug.hpp"
 #include "lvgl/lvgl.h"
-#include "ui/controller.hpp"
 #include "screens/main_screen.hpp"
+#include "ui/controller.hpp"
 #include "util.hpp"
 
 extern "C" {
@@ -33,10 +33,13 @@ void __appInit(void) {
     if (R_FAILED(smInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_SM));
     if (R_FAILED(hidInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_HID));
     if (R_FAILED(fsInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_FS));
-    if (R_FAILED(timeInitialize())) {
-        g_appInitSuccessful = false;  // timeInitialize TimeServiceType_System has failed in the past, so just in case
+    if (R_FAILED(rc = timeInitialize())) {
+        // TimeServiceType_System only has 2 available session normally,
+        // so we switch to TimeServiceType_User and flag the failure
+        timeExit();
+        g_appInitSuccessful = false;
         __nx_time_service_type = TimeServiceType_User;
-        if (R_FAILED(rc = timeInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_Time));
+        if (R_FAILED(rc = timeInitialize())) fatalThrow(rc);
     }
     if (R_FAILED(rc = apmInitialize())) fatalThrow(rc);
     if (R_FAILED(rc = setsysInitialize())) fatalThrow(rc);
@@ -77,7 +80,7 @@ int main(int argc, char* argv[]) {
 
     try {
         ui::Controller::show(MainScreen::getInstance());
-        } catch (std::runtime_error& e) {
+    } catch (std::runtime_error& e) {
         LOG("runtime_error: %s", e.what());
     }
 
