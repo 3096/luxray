@@ -1,3 +1,5 @@
+#include "overlay.hpp"
+
 #include <cstring>
 #include <stdexcept>
 
@@ -5,8 +7,6 @@
 #include "debug.hpp"
 #include "theme.hpp"
 #include "util.hpp"
-
-#include "overlay.hpp"
 
 extern "C" u64 __nx_vi_layer_id;
 
@@ -23,31 +23,29 @@ Overlay::Overlay() {
     TRY_GOTO(viCreateLayer(&m_viDisplay, &m_viLayer), close_managed_layer);
     TRY_GOTO(viSetLayerScalingMode(&m_viLayer, ViScalingMode_FitToLayer), close_managed_layer);
     TRY_GOTO(viSetLayerZ(&m_viLayer, 100), close_managed_layer);  // Arbitrary z index
-    TRY_GOTO(viSetLayerSize(&m_viLayer, LAYER_BASE_WIDTH, LAYER_BASE_HEIGHT), close_managed_layer);
-    try {
-        setIsDockedStatusImpl_(os::apmConsoleIsDocked());
-    } catch (std::runtime_error& e) {
-        LOG("%s", e.what());
-        goto close_managed_layer;
-    }
     TRY_GOTO(nwindowCreateFromLayer(&m_nWindow, &m_viLayer), close_managed_layer);
-    TRY_GOTO(framebufferCreate(&m_frameBufferInfo, &m_nWindow, LAYER_BASE_WIDTH, LAYER_BASE_HEIGHT,
+    TRY_GOTO(framebufferCreate(&m_frameBufferInfo, &m_nWindow, LAYER_BUFFER_WIDTH, LAYER_BUFFER_HEIGHT,
                                PIXEL_FORMAT_BGRA_8888, 2),
              close_window);
 #if USE_LINEAR_BUF
     TRY_GOTO(framebufferMakeLinear(&m_frameBufferInfo), close_fb);
 #endif
     mp_frameBuffers[0] = m_frameBufferInfo.buf;
-    mp_frameBuffers[1] = (lv_color_t*)m_frameBufferInfo.buf + LAYER_BUF_LENGTH;
+    mp_frameBuffers[1] = (lv_color_t*)m_frameBufferInfo.buf + LAYER_BUFFER_SIZE;
 
     LOG("libnx initialized");
 
     lv_init();
     lv_disp_drv_init(&m_dispDrv);
-    lv_disp_buf_init(&m_dispBufferInfo, mp_renderBuf, nullptr, LAYER_BUF_LENGTH);
+    lv_disp_buf_init(&m_dispBufferInfo, mp_renderBuf, nullptr, LAYER_BUFFER_SIZE);
     m_dispDrv.buffer = &m_dispBufferInfo;
     m_dispDrv.flush_cb = flushBuffer_;
-    lv_disp_drv_register(&m_dispDrv);
+    try {
+        setLayerSizeAndPosition_(os::apmConsoleIsDocked());  // this registers m_dispDrv
+    } catch (std::runtime_error& e) {
+        LOG("%s", e.what());
+        goto close_fb;
+    }
 
     lv_indev_drv_init(&m_touchDrv);
     m_touchDrv.type = LV_INDEV_TYPE_POINTER;
@@ -67,8 +65,8 @@ Overlay::Overlay() {
     m_doRender = true;
     return;
 
+close_fb:;
 #if USE_LINEAR_BUF
-close_fb:
     framebufferClose(&m_frameBufferInfo);
 #endif
 close_window:
@@ -115,7 +113,7 @@ void Overlay::flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_co
     // https://github.com/switchbrew/libnx/blob/v1.6.0/nx/include/switch/display/gfx.h#L106-L119
     for (int y = p_area->y1; y <= p_area->y2; y++) {
         for (int x = p_area->x1; x <= p_area->x2; x++) {
-            u32 swizzledPos = ((y & 127) / 16) + (x / 16 * 8) + ((y / 16 / 8) * (LAYER_BASE_WIDTH / 16 * 8));
+            u32 swizzledPos = ((y & 127) / 16) + (x / 16 * 8) + ((y / 16 / 8) * (LAYER_BUFFER_WIDTH / 16 * 8));
             swizzledPos *= 16 * 16 * 4;
             swizzledPos += ((y % 16) / 8) * 512 + ((x % 16) / 8) * 256 + ((y % 8) / 2) * 64 + ((x % 8) / 4) * 32 +
                            (y % 2) * 16 + (x % 4) * 4;
@@ -196,8 +194,15 @@ bool Overlay::keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
 
 void Overlay::waitForVSync() { TRY_THROW(eventWait(&s_instance.m_viDisplayVsyncEvent, UINT64_MAX)); }
 
-void Overlay::setIsDockedStatusImpl_(bool isDocked) {
-    s_instance.m_isDocked = isDocked;
-    TRY_THROW(viSetLayerPosition(&s_instance.m_viLayer, s_instance.getCurLayerInfo_().POS_X,
-                                 s_instance.getCurLayerInfo_().POS_Y));
+void Overlay::setLayerSizeAndPosition_(bool isDocked) {
+    m_isDocked = isDocked;
+    flushEmptyFb();
+    const LayerInfo& curLayerInfo = getCurLayerInfo_();
+    TRY_THROW(nwindowSetCrop(&m_nWindow, 0, 0, curLayerInfo.WIDTH, curLayerInfo.HEIGHT));
+    // might need to check clipping here, for vi error 4 (2114-0004 / 0x872)
+    TRY_THROW(viSetLayerPosition(&m_viLayer, curLayerInfo.POS_X, curLayerInfo.POS_Y));
+    TRY_THROW(viSetLayerSize(&m_viLayer, curLayerInfo.WIDTH, curLayerInfo.HEIGHT));
+    m_dispDrv.hor_res = curLayerInfo.WIDTH;
+    m_dispDrv.ver_res = curLayerInfo.HEIGHT;
+    lv_disp_drv_register(&m_dispDrv);
 }

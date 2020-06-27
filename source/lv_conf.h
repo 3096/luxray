@@ -21,8 +21,8 @@
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#define LV_HOR_RES_MAX          LAYER_BASE_WIDTH
-#define LV_VER_RES_MAX          LAYER_BASE_HEIGHT
+#define LV_HOR_RES_MAX          LAYER_BUFFER_WIDTH
+#define LV_VER_RES_MAX          LAYER_BUFFER_HEIGHT
 
 /* Color depth:
  * - 1:  1 byte per pixel

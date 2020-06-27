@@ -17,7 +17,7 @@ class MainScreen : public IScreen {
     SubScreen m_screenToShow;
     bool m_shouldExit;
 
-    BasicScreen m_basicScreen;
+    BasicScreenProvider m_basicScreen;
 
     virtual void procFrame();
 

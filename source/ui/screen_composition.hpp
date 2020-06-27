@@ -5,14 +5,14 @@
 #include "../lvgl/lvgl.h"
 #include "../ui/controller.hpp"
 
-class BasicScreen {
+class BasicScreenProvider {
    private:
     lv_obj_t* mp_screenObj;
     lv_group_t* mp_inputGroup;
 
    public:
-    BasicScreen();
-    ~BasicScreen();
+    BasicScreenProvider();
+    ~BasicScreenProvider();
 
     inline lv_obj_t* getLvScreenObj() { return mp_screenObj; }
     inline lv_group_t* getLvInputGroup() { return mp_inputGroup; }

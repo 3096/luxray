@@ -73,7 +73,7 @@ class TimeScreen : public IScreen {
     std::string m_valueLabelStr;
 
     // composition
-    BasicScreen m_basicScreen;
+    BasicScreenProvider m_basicScreen;
 
     // helpers
     void handleButtonEventImpl_();

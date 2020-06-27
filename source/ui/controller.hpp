@@ -18,7 +18,6 @@ class Controller {
     bool m_ScreenIsJustToggled;
     bool m_screenIsOn;
     bool m_shouldExit;
-    bool m_isDocked;
 
     uint64_t m_keysDown;
     uint64_t m_keysHeld;

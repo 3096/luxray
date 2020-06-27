@@ -1,11 +1,11 @@
+#include "controller.hpp"
+
 #include <cassert>
 #include <stdexcept>
 
 #include "../core/system.hpp"
 #include "../overlay.hpp"
 #include "../util.hpp"
-
-#include "controller.hpp"
 
 namespace ui {
 
@@ -36,10 +36,11 @@ void Controller::threadMain_() {
     // main loop
     while (true) {
         // check dock status
-        if (os::apmConsoleIsDocked() != m_isDocked) {
-            // TODO: update overlay driver
+        // TODO: use an event for this to reduce ipc overhead
+        auto curIsDocked = os::apmConsoleIsDocked();
+        if (curIsDocked != Overlay::getIsDockedStatus()) {
+            Overlay::setIsDockedStatus(curIsDocked);
             // TODO: re-render cur screen
-            m_isDocked = !m_isDocked;
         }
 
         // update hid
@@ -66,7 +67,6 @@ void Controller::threadMain_() {
             // check if next screen is requested
             if (mp_nextScreen) {
                 mp_curScreen->unmount();
-
                 mountScreen_(mp_nextScreen);
 
                 mp_curScreen = mp_nextScreen;
@@ -74,8 +74,8 @@ void Controller::threadMain_() {
             }
 
             // curScreen process frame
-            lv_task_handler();
             mp_curScreen->procFrame();
+            lv_task_handler();
         }
 
         // check if exit is requested

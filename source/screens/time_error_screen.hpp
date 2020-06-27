@@ -10,7 +10,7 @@ class TimeErrorScreen : public IScreen {
     ~TimeErrorScreen();
     static TimeErrorScreen s_instance;
 
-    BasicScreen m_basicScreen;
+    BasicScreenProvider m_basicScreen;
 
     virtual void procFrame();
     virtual inline lv_obj_t* getLvScreenObj() { return m_basicScreen.getLvScreenObj(); }

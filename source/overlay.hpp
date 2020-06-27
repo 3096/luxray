@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
-
 #include <switch.h>
+
+#include <memory>
 
 #include "config.h"
 #include "layer_info.h"
@@ -40,7 +40,7 @@ class Overlay {
     // lvgl members
     lv_disp_drv_t m_dispDrv;
     lv_disp_buf_t m_dispBufferInfo;
-    lv_color_t mp_renderBuf[LAYER_BUF_LENGTH];
+    lv_color_t mp_renderBuf[LAYER_BUFFER_SIZE];
     lv_indev_drv_t m_touchDrv;
     lv_indev_drv_t m_keyDrv;
     lv_theme_t* mp_theme;
@@ -52,7 +52,7 @@ class Overlay {
 
     inline void copyPrivFb_();
     inline const LayerInfo& getCurLayerInfo_() { return m_isDocked ? DOCKED_LAYER_INFO : HANDHELD_LAYER_INFO; }
-    void setIsDockedStatusImpl_(bool isDocked);
+    void setLayerSizeAndPosition_(bool isDocked);
 
     static void flushBuffer_(lv_disp_drv_t* p_disp, const lv_area_t* p_area, lv_color_t* p_lvBuffer);
     static bool touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data);
@@ -67,5 +67,5 @@ class Overlay {
     static void waitForVSync();
 
     static inline bool getIsDockedStatus() { return s_instance.m_isDocked; }
-    static inline void setIsDockedStatus(bool isDocked) { s_instance.setIsDockedStatusImpl_(isDocked); }
+    static inline void setIsDockedStatus(bool isDocked) { s_instance.setLayerSizeAndPosition_(isDocked); }
 };
