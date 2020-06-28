@@ -1,3 +1,5 @@
+#include "main_screen.hpp"
+
 #include <switch.h>
 
 #include "../core/system.hpp"
@@ -6,14 +8,11 @@
 #include "time_error_screen.hpp"
 #include "time_screen.hpp"
 
-#include "main_screen.hpp"
-
 MainScreen MainScreen::s_instance;
 
 MainScreen::MainScreen() : m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
     // list of buttons to different screens
     mp_screenListObj = lv_list_create(getLvScreenObj(), nullptr);
-    lv_obj_align(mp_screenListObj, nullptr, LV_ALIGN_CENTER, 0, 0);
 
     // TODO: refactor the strings here
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Date Advance"), handleShowTimeScreen_);
@@ -25,6 +24,8 @@ MainScreen::MainScreen() : m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
 }
 
 MainScreen::~MainScreen() {}
+
+void MainScreen::renderScreen() { lv_obj_align(mp_screenListObj, nullptr, LV_ALIGN_CENTER, 0, 0); }
 
 void MainScreen::procFrame() {
     switch (m_screenToShow) {

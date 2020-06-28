@@ -196,12 +196,18 @@ void Overlay::waitForVSync() { TRY_THROW(eventWait(&s_instance.m_viDisplayVsyncE
 
 void Overlay::setLayerSizeAndPosition_(bool isDocked) {
     m_isDocked = isDocked;
-    flushEmptyFb();
     const LayerInfo& curLayerInfo = getCurLayerInfo_();
     TRY_THROW(nwindowSetCrop(&m_nWindow, 0, 0, curLayerInfo.WIDTH, curLayerInfo.HEIGHT));
-    // might need to check clipping here, for vi error 4 (2114-0004 / 0x872)
-    TRY_THROW(viSetLayerPosition(&m_viLayer, curLayerInfo.POS_X, curLayerInfo.POS_Y));
-    TRY_THROW(viSetLayerSize(&m_viLayer, curLayerInfo.WIDTH, curLayerInfo.HEIGHT));
+    // TODO: check clipping here, for vi error 4 (2114-0004 / 0x872)
+    // TODO: control position another way
+    if (isDocked) {
+        TRY_THROW(viSetLayerSize(&m_viLayer, curLayerInfo.WIDTH, curLayerInfo.HEIGHT));
+        TRY_THROW(viSetLayerPosition(&m_viLayer, curLayerInfo.POS_X, curLayerInfo.POS_Y));
+    } else {
+        TRY_THROW(viSetLayerPosition(&m_viLayer, curLayerInfo.POS_X, curLayerInfo.POS_Y));
+        TRY_THROW(viSetLayerSize(&m_viLayer, curLayerInfo.WIDTH * DOCK_HANDHELD_PIXEL_RATIO,
+                                 curLayerInfo.HEIGHT * DOCK_HANDHELD_PIXEL_RATIO));
+    }
     m_dispDrv.hor_res = curLayerInfo.WIDTH;
     m_dispDrv.ver_res = curLayerInfo.HEIGHT;
     lv_disp_drv_register(&m_dispDrv);

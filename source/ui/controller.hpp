@@ -15,15 +15,16 @@ class Controller {
     IScreen* mp_curScreen;
     IScreen* mp_nextScreen;
 
-    bool m_ScreenIsJustToggled;
+    bool m_screenIsJustToggled;
     bool m_screenIsOn;
+    bool m_shouldRerender;
     bool m_shouldExit;
 
     uint64_t m_keysDown;
     uint64_t m_keysHeld;
 
     // helpers
-    void mountScreen_(IScreen* screenToMount);
+    inline void mountScreen_(IScreen* screenToMount);
     void threadMain_();
 
    public:

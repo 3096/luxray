@@ -83,10 +83,11 @@ class TimeScreen : public IScreen {
     void updateLabels_();
 
     // interface
-    virtual void procFrame();
+    virtual void renderScreen() override;
+    virtual void procFrame() override;
 
-    virtual inline lv_obj_t* getLvScreenObj() { return m_basicScreen.getLvScreenObj(); }
-    virtual inline lv_group_t* getLvInputGroup() { return m_basicScreen.getLvInputGroup(); }
+    virtual inline lv_obj_t* getLvScreenObj() override { return m_basicScreen.getLvScreenObj(); }
+    virtual inline lv_group_t* getLvInputGroup() override { return m_basicScreen.getLvInputGroup(); }
 
    public:
     static inline TimeScreen& getInstance() { return s_instance; }

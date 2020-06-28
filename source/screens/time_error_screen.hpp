@@ -10,11 +10,14 @@ class TimeErrorScreen : public IScreen {
     ~TimeErrorScreen();
     static TimeErrorScreen s_instance;
 
+    lv_obj_t* mp_errorMsgLabel;
+
     BasicScreenProvider m_basicScreen;
 
-    virtual void procFrame();
-    virtual inline lv_obj_t* getLvScreenObj() { return m_basicScreen.getLvScreenObj(); }
-    virtual inline lv_group_t* getLvInputGroup() { return m_basicScreen.getLvInputGroup(); }
+    virtual void renderScreen() override;
+    virtual void procFrame() override;
+    virtual inline lv_obj_t* getLvScreenObj() override { return m_basicScreen.getLvScreenObj(); }
+    virtual inline lv_group_t* getLvInputGroup() override { return m_basicScreen.getLvInputGroup(); }
 
    public:
     static inline TimeErrorScreen& getInstance() { return s_instance; }

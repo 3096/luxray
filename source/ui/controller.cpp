@@ -14,8 +14,9 @@ Controller Controller::s_instance;
 Controller::Controller()
     : mp_curScreen(nullptr),
       mp_nextScreen(nullptr),
-      m_ScreenIsJustToggled(false),
+      m_screenIsJustToggled(false),
       m_screenIsOn(true),
+      m_shouldRerender(true),
       m_shouldExit(false) {
     LOG("ui::Controller initialized");
 }
@@ -23,9 +24,10 @@ Controller::Controller()
 Controller::~Controller() {}
 
 void Controller::mountScreen_(IScreen* screenToMount) {
+    screenToMount->mount();
     lv_indev_set_group(gp_keyIn, screenToMount->getLvInputGroup());
     lv_scr_load(screenToMount->getLvScreenObj());
-    screenToMount->mount();
+    m_shouldRerender = true;
 }
 
 void Controller::threadMain_() {
@@ -35,14 +37,6 @@ void Controller::threadMain_() {
 
     // main loop
     while (true) {
-        // check dock status
-        // TODO: use an event for this to reduce ipc overhead
-        auto curIsDocked = os::apmConsoleIsDocked();
-        if (curIsDocked != Overlay::getIsDockedStatus()) {
-            Overlay::setIsDockedStatus(curIsDocked);
-            // TODO: re-render cur screen
-        }
-
         // update hid
         hidScanInput();
         m_keysDown = hidKeysDown(CONTROLLER_P1_AUTO);
@@ -51,16 +45,16 @@ void Controller::threadMain_() {
         bool screenToggleKeysPressed = (m_keysHeld | KEY_DUP | KEY_RSTICK_UP) == m_keysHeld;
 
         // update screen toggle
-        if (not m_ScreenIsJustToggled and screenToggleKeysPressed) {
+        if (not m_screenIsJustToggled and screenToggleKeysPressed) {
             m_screenIsOn = !m_screenIsOn;
-            m_ScreenIsJustToggled = true;
+            m_screenIsJustToggled = true;
             if (m_screenIsOn) {
-                lv_obj_invalidate(mp_curScreen->getLvScreenObj());  // Re-render screen
+                m_shouldRerender = true;
             } else {
                 Overlay::flushEmptyFb();  // Turn off screen
             }
-        } else if (m_ScreenIsJustToggled and not screenToggleKeysPressed) {
-            m_ScreenIsJustToggled = false;
+        } else if (m_screenIsJustToggled and not screenToggleKeysPressed) {
+            m_screenIsJustToggled = false;
         }
 
         if (m_screenIsOn) {
@@ -71,6 +65,24 @@ void Controller::threadMain_() {
 
                 mp_curScreen = mp_nextScreen;
                 mp_nextScreen = nullptr;
+            }
+
+            // check if dock status changed
+            // TODO: use an event for this to reduce ipc overhead
+            auto curIsDocked = os::apmConsoleIsDocked();
+            if (curIsDocked != Overlay::getIsDockedStatus()) {
+                Overlay::setIsDockedStatus(curIsDocked);
+                m_shouldRerender = true;
+                lv_task_handler();  // need to handle the dispplay driver change before rendering
+            }
+
+            // if screen needs re-render
+            if (m_shouldRerender) {
+                Overlay::pauseRendering();
+                mp_curScreen->renderScreen();
+                Overlay::resumeRendering();
+                lv_obj_invalidate(mp_curScreen->getLvScreenObj());
+                m_shouldRerender = false;
             }
 
             // curScreen process frame

@@ -11,7 +11,7 @@ class MainScreen : public IScreen {
     static MainScreen s_instance;
 
     enum SubScreen { TIME_SCREEN = 0, NO_SUB_SCREEN };
-    
+
     lv_obj_t* mp_screenListObj;
 
     SubScreen m_screenToShow;
@@ -19,10 +19,11 @@ class MainScreen : public IScreen {
 
     BasicScreenProvider m_basicScreen;
 
-    virtual void procFrame();
+    virtual void renderScreen() override;
+    virtual void procFrame() override;
 
-    virtual inline lv_obj_t* getLvScreenObj() { return m_basicScreen.getLvScreenObj(); }
-    virtual inline lv_group_t* getLvInputGroup() { return m_basicScreen.getLvInputGroup(); }
+    virtual inline lv_obj_t* getLvScreenObj() override { return m_basicScreen.getLvScreenObj(); }
+    virtual inline lv_group_t* getLvInputGroup() override { return m_basicScreen.getLvInputGroup(); }
 
     // helpers
     void showScreen_(IScreen& screenToShow);

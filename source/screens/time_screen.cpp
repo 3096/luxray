@@ -22,8 +22,6 @@ TimeScreen::TimeScreen()
     lv_win_set_title(p_window, "  Date Advance");
 
     mp_promptLabel = lv_label_create(p_window, nullptr);
-    lv_obj_align(mp_promptLabel, nullptr, LV_ALIGN_IN_TOP_LEFT, 18, 18);
-
     mp_valueLabel = lv_label_create(p_window, nullptr);
     lv_label_set_align(mp_valueLabel, LV_LABEL_ALIGN_RIGHT);
 
@@ -34,17 +32,20 @@ TimeScreen::TimeScreen()
     lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNMATRIX_CTRL_CHECKABLE);
     if (m_doAutoReset) lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNMATRIX_CTRL_CHECK_STATE);
     lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_NTP, LV_BTNMATRIX_CTRL_DISABLED);
-    lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
     lv_obj_set_event_cb(mp_buttonMatrix, handleButtonEvent_);
 
     lv_group_add_obj(getLvInputGroup(), mp_buttonMatrix);
-
-    updateLabels_();
 
     LOG("TimeScreen initialized");
 }
 
 TimeScreen::~TimeScreen() {}
+
+void TimeScreen::renderScreen() {
+    lv_obj_align(mp_promptLabel, nullptr, LV_ALIGN_IN_TOP_LEFT, 18, 18);
+    lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
+    updateLabels_();
+}
 
 void TimeScreen::procFrame() {
     Overlay::pauseRendering();  // lv tries to draw text before it knows where, smh
