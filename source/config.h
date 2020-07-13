@@ -1,5 +1,7 @@
 #pragma once
 
+#define INNER_HEAP_SIZE                 0x300000
+
 // docked params
 #define OVERLAY_BASE_WIDTH_DOCKED       320
 #define OVERLAY_BASE_HEIGHT_DOCKED      384
@@ -14,5 +16,7 @@
 #define OVERLAY_POS_X_HANDHELD          0
 #define OVERLAY_POS_Y_HANDHELD          0
 
-#define INNER_HEAP_SIZE                 0x300000
-#define USE_LINEAR_BUF                  0
+// debug options
+#define NDEBUG
+// #define DEBUG_LOG_FILE
+// #define DEBUG_NX_LINK

@@ -47,7 +47,21 @@ void __appInit(void) {
     if (R_FAILED(rc = viInitialize(ViServiceType_Manager))) fatalThrow(rc);
 
     __libnx_init_time();
-    fsdevMountSdmc();
+    if (R_FAILED(fsdevMountSdmc())) fatalThrow(0x5D);
+
+    auto socketConfig = SocketInitConfig{.bsdsockets_version = 1,
+
+                                         .tcp_tx_buf_size = 0x800,
+                                         .tcp_rx_buf_size = 0x1000,
+                                         .tcp_tx_buf_max_size = 0,
+                                         .tcp_rx_buf_max_size = 0,
+
+                                         .udp_tx_buf_size = 0x2400,
+                                         .udp_rx_buf_size = 0xA500,
+
+                                         .sb_efficiency = 1};
+    TRY_FATAL(socketInitialize(&socketConfig));
+
     debugInit();
 
     LOG("service init");
@@ -55,6 +69,8 @@ void __appInit(void) {
 
 void __appExit(void) {
     // Cleanup services.
+    debugExit();
+    socketExit();
     fsdevUnmountAll();
     viExit();
     nifmExit();
@@ -85,5 +101,4 @@ int main(int argc, char* argv[]) {
     }
 
     LOG("Main exit");
-    debugExit();
 }

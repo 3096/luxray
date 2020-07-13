@@ -1,17 +1,16 @@
-#include <stdexcept>
-#include <string>
+#include "system.hpp"
 
 #include <switch.h>
 
-#include "../debug.hpp"
+#include <stdexcept>
+#include <string>
 
-#include "system.hpp"
+#include "../util.hpp"
 
 bool os::nifmInternetIsConnected() {
     NifmInternetConnectionStatus nifmICS;
     Result rs = nifmGetInternetConnectionStatus(NULL, NULL, &nifmICS);
     if (R_FAILED(rs)) {
-        // LOG("nifmGetInternetConnectionStatus failed with error code %x", rs);
         return false;
     }
 

@@ -1,6 +1,7 @@
 #include "time_screen.hpp"
 
 #include <cstring>
+#include <stdexcept>
 
 #include "../core/system.hpp"
 #include "../debug.hpp"

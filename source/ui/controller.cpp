@@ -4,8 +4,8 @@
 #include <stdexcept>
 
 #include "../core/system.hpp"
+#include "../debug.hpp"
 #include "../overlay.hpp"
-#include "../util.hpp"
 
 namespace ui {
 
@@ -32,7 +32,7 @@ void Controller::mountScreen_(IScreen* screenToMount) {
 
 void Controller::threadMain_() {
     // mount inital screen
-    DEBUG_ASSERT(mp_curScreen);
+    // DEBUG_ASSERT(mp_curScreen);  // TODO: implement an assert
     mountScreen_(mp_curScreen);
 
     // main loop

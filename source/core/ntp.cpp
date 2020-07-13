@@ -28,42 +28,23 @@ information. */
 
 #define _BSD_SOURCE
 
+#include "ntp.hpp"
+
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <switch.h>
 #include <sys/socket.h>
+
 #include <cstring>
 #include <stdexcept>
 #include <string>
 
-#include <switch.h>
-
 #include "../debug.hpp"
 
-#include "ntp.hpp"
-
 time_t ntpGetTime() {
-    SocketInitConfig sockConf = {.bsdsockets_version = 1,
-
-                                 .tcp_tx_buf_size = 0x800,
-                                 .tcp_rx_buf_size = 0x1000,
-                                 .tcp_tx_buf_max_size = 0,
-                                 .tcp_rx_buf_max_size = 0,
-
-                                 .udp_tx_buf_size = 0x2400,
-                                 .udp_rx_buf_size = 0xA500,
-
-                                 .sb_efficiency = 1};
-
-    Result rs = socketInitialize(&sockConf);
-    if (R_FAILED(rs)) {
-        std::string msg = "Failed to init socket services, error code " + std::to_string(rs);
-        throw std::runtime_error(msg);
-    }
-    LOG("Socket services initialized");
-
-    const char* SERVER_NAME = "0.pool.ntp.org";
-    const uint16_t PORT = 123;
+    static const char* SERVER_NAME = "0.pool.ntp.org";
+    static const uint16_t PORT = 123;
 
     int sockfd = -1;
     sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -115,6 +96,5 @@ time_t ntpGetTime() {
     }
     packet.txTm_s = ntohl(packet.txTm_s);
 
-    socketExit();
     return (time_t)(packet.txTm_s - NTP_TIMESTAMP_DELTA);
 }
