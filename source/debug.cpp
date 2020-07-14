@@ -61,19 +61,22 @@ void debugExit() {
 
 void debugLogFormat(const char* prettyFunction, const char* fmt, ...) {
     va_list args;
+    va_start(args, fmt);
 
 #    ifdef DEBUG_LOG_FILE
     fprintf(g_debug_file, "%s: ", prettyFunction);
-    fprintf(g_debug_file, fmt, args);
+    vfprintf(g_debug_file, fmt, args);
     fprintf(g_debug_file, "\n");
     fflush(g_debug_file);
 #    endif
 
 #    ifdef DEBUG_NX_LINK
     printf("%s: ", prettyFunction);
-    printf(fmt, args);
+    vprintf(fmt, args);
     printf("\n");
 #    endif
+
+    va_end(args);
 }
 
 void __libnx_exception_handler(ThreadExceptionDump* ctx) {
