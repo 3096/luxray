@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../ui/i_screen.hpp"
-#include "../ui/screen_composition.hpp"
+#include "../ui/basic_screen_provider.hpp"
 
-class MainScreen : public IScreen {
+class MainScreen : public ui::IScreen {
    private:
     MainScreen();
     MainScreen(const MainScreen&) = delete;
@@ -17,7 +17,7 @@ class MainScreen : public IScreen {
     SubScreen m_screenToShow;
     bool m_shouldExit;
 
-    BasicScreenProvider m_basicScreen;
+    ui::BasicScreenProvider m_basicScreen;
 
     virtual void renderScreen() override;
     virtual void procFrame() override;
@@ -26,7 +26,7 @@ class MainScreen : public IScreen {
     virtual inline lv_group_t* getLvInputGroup() override { return m_basicScreen.getLvInputGroup(); }
 
     // helpers
-    void showScreen_(IScreen& screenToShow);
+    void showScreen_(ui::IScreen& screenToShow);
     void handleShowScreen_(lv_event_t event, SubScreen screenToShow);
 
     // callbacks

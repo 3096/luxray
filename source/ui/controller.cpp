@@ -37,6 +37,12 @@ void Controller::threadMain_() {
 
     // main loop
     while (true) {
+        // check if exit is requested
+        if (m_shouldExit) {
+            mp_curScreen->unmount();
+            break;
+        }
+
         // update hid
         hidScanInput();
         m_keysDown = hidKeysDown(CONTROLLER_P1_AUTO);
@@ -67,33 +73,18 @@ void Controller::threadMain_() {
                 mp_nextScreen = nullptr;
             }
 
-            // check if dock status changed
-            // TODO: use an event for this to reduce ipc overhead
-            auto curIsDocked = os::apmConsoleIsDocked();
-            if (curIsDocked != Overlay::getIsDockedStatus()) {
-                Overlay::setIsDockedStatus(curIsDocked);
+            if (Overlay::getIsDockedStatusChanged()) {
                 m_shouldRerender = true;
-                lv_task_handler();  // need to handle the dispplay driver change before rendering
             }
 
-            // if screen needs re-render
             if (m_shouldRerender) {
-                Overlay::pauseRendering();
                 mp_curScreen->renderScreen();
-                Overlay::resumeRendering();
-                lv_obj_invalidate(mp_curScreen->getLvScreenObj());
                 m_shouldRerender = false;
             }
 
             // curScreen process frame
             mp_curScreen->procFrame();
             lv_task_handler();
-        }
-
-        // check if exit is requested
-        if (m_shouldExit) {
-            mp_curScreen->unmount();
-            break;
         }
 
         Overlay::waitForVSync();

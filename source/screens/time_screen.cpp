@@ -20,15 +20,24 @@ TimeScreen::TimeScreen()
       m_curTargetChange(0),
       m_curTargetSign(1) {
     lv_obj_t* p_window = lv_win_create(getLvScreenObj(), nullptr);
+    // m_basicScreen.addLvObjPositionUpdater(p_window, m_basicScreen.UPDATE_FIT_PARENT);  TODO: use proper win updater
     lv_win_set_title(p_window, "  Date Advance");
 
     mp_promptLabel = lv_label_create(p_window, nullptr);
+    lv_obj_align(mp_promptLabel, nullptr, LV_ALIGN_IN_TOP_LEFT, 18, 18);
+    m_basicScreen.addLvObjPositionUpdater(mp_promptLabel, lv_obj_realign);
+
     mp_valueLabel = lv_label_create(p_window, nullptr);
     lv_label_set_align(mp_valueLabel, LV_LABEL_ALIGN_RIGHT);
+    lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -18, 18);
+    m_basicScreen.addLvObjPositionUpdater(mp_valueLabel, lv_obj_realign);
+
+    mp_buttonMatrix = lv_btnmatrix_create(p_window, NULL);
+    lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
+    m_basicScreen.addLvObjPositionUpdater(p_window, lv_obj_realign);
 
     std::memcpy(m_buttonMap, INITIAL_BUTTON_MAP, sizeof(INITIAL_BUTTON_MAP));
-    mp_buttonMatrix = lv_btnmatrix_create(p_window, NULL);
-    lv_btnmatrix_set_map(mp_buttonMatrix, (const char**)m_buttonMap);
+    lv_btnmatrix_set_map(mp_buttonMatrix, static_cast<const char**>(m_buttonMap));
     lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_NEGATIVE, LV_BTNMATRIX_CTRL_CHECKABLE);
     lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNMATRIX_CTRL_CHECKABLE);
     if (m_doAutoReset) lv_btnmatrix_set_btn_ctrl(mp_buttonMatrix, BUTTON_AUTORESET, LV_BTNMATRIX_CTRL_CHECK_STATE);
@@ -43,8 +52,7 @@ TimeScreen::TimeScreen()
 TimeScreen::~TimeScreen() {}
 
 void TimeScreen::renderScreen() {
-    lv_obj_align(mp_promptLabel, nullptr, LV_ALIGN_IN_TOP_LEFT, 18, 18);
-    lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
+    m_basicScreen.renderScreen();
     updateLabels_();
 }
 
@@ -206,5 +214,5 @@ void TimeScreen::updateLabels_() {
     // render new text
     lv_label_set_text(mp_promptLabel, m_promptLabelStr.c_str());
     lv_label_set_text(mp_valueLabel, m_valueLabelStr.c_str());
-    lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -18, 18);
+    lv_obj_realign(mp_valueLabel);
 }

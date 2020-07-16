@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../ui/basic_screen_provider.hpp"
 #include "../ui/i_screen.hpp"
-#include "../ui/screen_composition.hpp"
 
-class TimeErrorScreen : public IScreen {
+class TimeErrorScreen : public ui::IScreen {
    private:
     TimeErrorScreen();
     TimeErrorScreen(const TimeErrorScreen&) = delete;
@@ -12,7 +12,7 @@ class TimeErrorScreen : public IScreen {
 
     lv_obj_t* mp_errorMsgLabel;
 
-    BasicScreenProvider m_basicScreen;
+    ui::BasicScreenProvider m_basicScreen;
 
     virtual void renderScreen() override;
     virtual void procFrame() override;

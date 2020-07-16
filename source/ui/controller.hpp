@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdlib>
+
 #include "i_screen.hpp"
 
 namespace ui {
@@ -29,7 +31,9 @@ class Controller {
 
    public:
     static void show(IScreen& screenToShow);
-    inline static void stop() { s_instance.m_shouldExit = true; }
+    inline static void stop() {
+        s_instance.m_shouldExit = true;
+    }
 
     inline static uint64_t getKeysDown() { return s_instance.m_keysDown; }
     inline static uint64_t getKeysHeld() { return s_instance.m_keysHeld; }

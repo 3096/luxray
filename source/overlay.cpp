@@ -40,12 +40,14 @@ Overlay::Overlay() {
     lv_disp_buf_init(&m_dispBufferInfo, mp_renderBuf, nullptr, LAYER_BUFFER_SIZE);
     m_dispDrv.buffer = &m_dispBufferInfo;
     m_dispDrv.flush_cb = flushBuffer_;
+    m_isDocked = os::apmConsoleIsDocked();
     try {
-        setLayerSizeAndPosition_(os::apmConsoleIsDocked());  // this registers m_dispDrv
+        setLayerSizeAndPosition_();
     } catch (std::runtime_error& e) {
         LOG("%s", e.what());
         goto close_fb;
     }
+    mp_disp = lv_disp_drv_register(&m_dispDrv);
 
     lv_indev_drv_init(&m_touchDrv);
     m_touchDrv.type = LV_INDEV_TYPE_POINTER;
@@ -65,10 +67,8 @@ Overlay::Overlay() {
     m_doRender = true;
     return;
 
-close_fb:;
-#if USE_LINEAR_BUF
+close_fb:
     framebufferClose(&m_frameBufferInfo);
-#endif
 close_window:
     nwindowClose(&m_nWindow);
 close_managed_layer:
@@ -82,6 +82,7 @@ end:
 Overlay::~Overlay() {
     LOG("Exit Overlay");
 
+    eventClose(&m_viDisplayVsyncEvent);
     framebufferClose(&m_frameBufferInfo);
     nwindowClose(&m_nWindow);
     viDestroyManagedLayer(&m_viLayer);
@@ -139,13 +140,13 @@ bool Overlay::touchRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
         data->state = LV_INDEV_STATE_PR;
         touchPosition touch;
         hidTouchRead(&touch, 0);
-        const LayerInfo& curLayerInfo = s_instance.getCurLayerInfo_();
+        auto curLayerInfo = s_instance.getCurLayerInfo_();
         if (Overlay::getIsDockedStatus()) {
-            data->point.x = touch.px - curLayerInfo.POS_X;
-            data->point.y = touch.py - curLayerInfo.POS_Y;
-        } else {
             data->point.x = touch.px * DOCK_HANDHELD_PIXEL_RATIO - curLayerInfo.POS_X;
             data->point.y = touch.py * DOCK_HANDHELD_PIXEL_RATIO - curLayerInfo.POS_Y;
+        } else {
+            data->point.x = touch.px - curLayerInfo.POS_X * DOCK_HANDHELD_PIXEL_RATIO;
+            data->point.y = touch.py - curLayerInfo.POS_Y * DOCK_HANDHELD_PIXEL_RATIO;
         }
     } else {
         data->state = LV_INDEV_STATE_REL;
@@ -194,13 +195,23 @@ bool Overlay::keysRead_(lv_indev_drv_t* indev_driver, lv_indev_data_t* data) {
 
 void Overlay::waitForVSync() { TRY_THROW(eventWait(&s_instance.m_viDisplayVsyncEvent, UINT64_MAX)); }
 
-void Overlay::setLayerSizeAndPosition_(bool isDocked) {
-    m_isDocked = isDocked;
-    const LayerInfo& curLayerInfo = getCurLayerInfo_();
+bool Overlay::getIsDockedStatusChanged() {
+    auto curIsDocked = os::apmConsoleIsDocked();
+    if (curIsDocked != s_instance.m_isDocked) {
+        s_instance.m_isDocked = curIsDocked;
+        s_instance.setLayerSizeAndPosition_();
+        lv_disp_drv_update(s_instance.mp_disp, &s_instance.m_dispDrv);
+        return true;
+    }
+    return false;
+}
+
+void Overlay::setLayerSizeAndPosition_() {
+    auto curLayerInfo = getCurLayerInfo_();
     TRY_THROW(nwindowSetCrop(&m_nWindow, 0, 0, curLayerInfo.WIDTH, curLayerInfo.HEIGHT));
     // TODO: check clipping here, for vi error 4 (2114-0004 / 0x872)
     // TODO: control position another way
-    if (isDocked) {
+    if (m_isDocked) {
         TRY_THROW(viSetLayerSize(&m_viLayer, curLayerInfo.WIDTH, curLayerInfo.HEIGHT));
         TRY_THROW(viSetLayerPosition(&m_viLayer, curLayerInfo.POS_X, curLayerInfo.POS_Y));
     } else {
@@ -210,5 +221,4 @@ void Overlay::setLayerSizeAndPosition_(bool isDocked) {
     }
     m_dispDrv.hor_res = curLayerInfo.WIDTH;
     m_dispDrv.ver_res = curLayerInfo.HEIGHT;
-    lv_disp_drv_register(&m_dispDrv);
 }

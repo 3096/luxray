@@ -4,9 +4,9 @@
 
 #include "../core/time.hpp"
 #include "../ui/i_screen.hpp"
-#include "../ui/screen_composition.hpp"
+#include "../ui/basic_screen_provider.hpp"
 
-class TimeScreen : public IScreen {
+class TimeScreen : public ui::IScreen {
    private:
     TimeScreen();
     TimeScreen(const TimeScreen&) = delete;
@@ -73,7 +73,7 @@ class TimeScreen : public IScreen {
     std::string m_valueLabelStr;
 
     // composition
-    BasicScreenProvider m_basicScreen;
+    ui::BasicScreenProvider m_basicScreen;
 
     // helpers
     void handleButtonEventImpl_();

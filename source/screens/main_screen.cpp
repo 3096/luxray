@@ -13,6 +13,8 @@ MainScreen MainScreen::s_instance;
 MainScreen::MainScreen() : m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
     // list of buttons to different screens
     mp_screenListObj = lv_list_create(getLvScreenObj(), nullptr);
+    lv_obj_align(mp_screenListObj, nullptr, LV_ALIGN_CENTER, 0, 0);
+    m_basicScreen.addLvObjPositionUpdater(mp_screenListObj, lv_obj_realign);
 
     // TODO: refactor the strings here
     lv_obj_set_event_cb(lv_list_add_btn(mp_screenListObj, nullptr, "Date Advance"), handleShowTimeScreen_);
@@ -25,7 +27,7 @@ MainScreen::MainScreen() : m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
 
 MainScreen::~MainScreen() {}
 
-void MainScreen::renderScreen() { lv_obj_align(mp_screenListObj, nullptr, LV_ALIGN_CENTER, 0, 0); }
+void MainScreen::renderScreen() { m_basicScreen.renderScreen(); }
 
 void MainScreen::procFrame() {
     switch (m_screenToShow) {
@@ -45,7 +47,7 @@ void MainScreen::procFrame() {
     }
 }
 
-void MainScreen::showScreen_(IScreen& screenToShow) {
+void MainScreen::showScreen_(ui::IScreen& screenToShow) {
     ui::Controller::show(screenToShow);
     // remove m_screenToShow to show main screen again
     m_screenToShow = NO_SUB_SCREEN;

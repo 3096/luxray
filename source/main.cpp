@@ -101,4 +101,5 @@ int main(int argc, char* argv[]) {
     }
 
     LOG("Main exit");
+    return 0;
 }
