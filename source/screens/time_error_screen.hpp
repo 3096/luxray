@@ -10,9 +10,9 @@ class TimeErrorScreen : public ui::IScreen {
     ~TimeErrorScreen();
     static TimeErrorScreen s_instance;
 
-    lv_obj_t* mp_errorMsgLabel;
-
     ui::BasicScreenProvider m_basicScreen;
+
+    lv_obj_t* mp_errorMsgLabel;
 
     virtual void renderScreen() override;
     virtual void procFrame() override;

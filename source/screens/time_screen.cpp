@@ -5,8 +5,9 @@
 
 #include "../core/system.hpp"
 #include "../debug.hpp"
-#include "../overlay.hpp"
+#include "../screens/main_screen.hpp"
 #include "../ui/controller.hpp"
+#include "../ui/lv_helper.hpp"
 
 TimeScreen TimeScreen::s_instance;
 
@@ -19,22 +20,26 @@ TimeScreen::TimeScreen()
       m_internetIsConnected(false),
       m_curTargetChange(0),
       m_curTargetSign(1) {
+    //
     lv_obj_t* p_window = lv_win_create(getLvScreenObj(), nullptr);
-    // m_basicScreen.addLvObjPositionUpdater(p_window, m_basicScreen.UPDATE_FIT_PARENT);  TODO: use proper win updater
+    m_basicScreen.addLvObjPositionUpdater(p_window, ui::lv_win::updateFitParent);
     lv_win_set_title(p_window, "  Date Advance");
 
     mp_promptLabel = lv_label_create(p_window, nullptr);
-    lv_obj_align(mp_promptLabel, nullptr, LV_ALIGN_IN_TOP_LEFT, 18, 18);
-    m_basicScreen.addLvObjPositionUpdater(mp_promptLabel, lv_obj_realign);
+    m_basicScreen.addLvObjPositionUpdater(mp_promptLabel, [](lv_obj_t* mp_promptLabel) {
+        lv_obj_align(mp_promptLabel, nullptr, LV_ALIGN_IN_TOP_LEFT, ui::size::MARGIN(), ui::size::MARGIN());
+    });
 
     mp_valueLabel = lv_label_create(p_window, nullptr);
     lv_label_set_align(mp_valueLabel, LV_LABEL_ALIGN_RIGHT);
-    lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -18, 18);
-    m_basicScreen.addLvObjPositionUpdater(mp_valueLabel, lv_obj_realign);
+    m_basicScreen.addLvObjPositionUpdater(mp_valueLabel, [](lv_obj_t* mp_valueLabel) {
+        lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -ui::size::MARGIN(), ui::size::MARGIN());
+    });
 
     mp_buttonMatrix = lv_btnmatrix_create(p_window, NULL);
-    lv_obj_align(mp_buttonMatrix, nullptr, LV_ALIGN_IN_BOTTOM_MID, 0, -18);
-    m_basicScreen.addLvObjPositionUpdater(p_window, lv_obj_realign);
+    m_basicScreen.addLvObjPositionUpdater(mp_buttonMatrix, [p_window](lv_obj_t* mp_buttonMatrix) {
+        lv_obj_align(mp_buttonMatrix, p_window, LV_ALIGN_IN_BOTTOM_MID, 0, -ui::size::MARGIN());
+    });
 
     std::memcpy(m_buttonMap, INITIAL_BUTTON_MAP, sizeof(INITIAL_BUTTON_MAP));
     lv_btnmatrix_set_map(mp_buttonMatrix, static_cast<const char**>(m_buttonMap));

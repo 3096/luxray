@@ -1,7 +1,5 @@
 #include "basic_screen_provider.hpp"
 
-#include <stdexcept>
-
 namespace ui {
 
 BasicScreenProvider::BasicScreenProvider()
@@ -20,15 +18,5 @@ void BasicScreenProvider::renderScreen() {
         screenUpdater.updateCb(screenUpdater.p_lvObj);
     }
 }
-
-// void BasicScreenProvider::UPDATE_FIT_PARENT(lv_obj_t* p_lvObj) {
-//     auto* p_parent = lv_obj_get_parent(p_lvObj);
-//     if (p_parent) {
-//         lv_obj_set_size(p_lvObj, lv_obj_get_width_fit(p_parent), lv_obj_get_height_fit(p_parent));
-
-//     } else {
-//         throw std::runtime_error("lv obj must have a parent");
-//     }
-// }
 
 }  // namespace ui

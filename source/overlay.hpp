@@ -6,7 +6,7 @@
 
 #include "config.h"
 #include "layer_info.h"
-#include "screens/main_screen.hpp"
+#include "lvgl/lvgl.h"
 
 extern lv_indev_t* gp_keyIn;
 extern lv_indev_t* gp_touchIn;
@@ -69,4 +69,9 @@ class Overlay {
 
     static bool getIsDockedStatusChanged();
     static inline bool getIsDockedStatus() { return s_instance.m_isDocked; }
+
+    static inline auto getScaledRenderCoord(int baseCord) {
+        return s_instance.m_isDocked ? baseCord * OVERLAY_UPSCALE_DOCKED
+                                     : baseCord * OVERLAY_UPSCALE_HANDHELD * HANDHELD_DOCK_PIXEL_RATIO;
+    }
 };

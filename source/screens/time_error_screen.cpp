@@ -6,7 +6,8 @@
 
 TimeErrorScreen TimeErrorScreen::s_instance;
 
-TimeErrorScreen::TimeErrorScreen() : ui::IScreen(), mp_errorMsgLabel(lv_label_create(getLvScreenObj(), nullptr)) {
+TimeErrorScreen::TimeErrorScreen() : ui::IScreen() {
+    mp_errorMsgLabel = lv_label_create(getLvScreenObj(), nullptr);
     lv_label_set_text(mp_errorMsgLabel,
                       "To use the Date Advance\n"
                       "feature, turn on\n"

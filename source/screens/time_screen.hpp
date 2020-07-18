@@ -3,8 +3,8 @@
 #include <memory>
 
 #include "../core/time.hpp"
-#include "../ui/i_screen.hpp"
 #include "../ui/basic_screen_provider.hpp"
+#include "../ui/i_screen.hpp"
 
 class TimeScreen : public ui::IScreen {
    private:
@@ -52,6 +52,9 @@ class TimeScreen : public ui::IScreen {
 
     static constexpr int MAX_TARGET_CHANGE = 999999;
 
+    // composition
+    ui::BasicScreenProvider m_basicScreen;
+
     // ui
     std::unique_ptr<TimeTaskHandler> mp_timeTaskHandler;
     lv_obj_t* mp_promptLabel;
@@ -71,9 +74,6 @@ class TimeScreen : public ui::IScreen {
     int8_t m_curTargetSign;
     std::string m_promptLabelStr;
     std::string m_valueLabelStr;
-
-    // composition
-    ui::BasicScreenProvider m_basicScreen;
 
     // helpers
     void handleButtonEventImpl_();

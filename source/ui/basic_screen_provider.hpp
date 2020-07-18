@@ -5,8 +5,8 @@
 #include <functional>
 #include <list>
 
-#include "../debug.hpp"
 #include "../lvgl/lvgl.h"
+#include "../overlay.hpp"
 #include "../ui/controller.hpp"
 
 namespace ui {
@@ -26,6 +26,9 @@ class BasicScreenProvider {
     BasicScreenProvider();
     ~BasicScreenProvider();
 
+    // transform to scaled render coord
+    static inline auto coord(int baseCoord) -> lv_coord_t { return Overlay::getScaledRenderCoord(baseCoord); }
+
     inline void addLvObjPositionUpdater(lv_obj_t* p_lvObj, std::function<void(lv_obj_t*)> updateCb) {
         m_lvObjUpdaterList.push_back({p_lvObj, updateCb});
     }
@@ -34,9 +37,6 @@ class BasicScreenProvider {
         m_lvObjUpdaterList.remove_if(
             [p_lvObjToRemove](LvObjPositionUpdater updater) { return updater.p_lvObj == p_lvObjToRemove; });
     }
-
-    // preset update methods
-    // static void UPDATE_FIT_PARENT(lv_obj_t* p_lvObj);
 
     inline bool returnButtonPressed() {
         return ui::Controller::getKeysDown() & KEY_L;  // TODO: make configurable
