@@ -2,16 +2,22 @@
 
 #include <cstdlib>
 
+#include "../debug.hpp"
 #include "i_screen.hpp"
 
 namespace ui {
 
 class Controller {
+    LOGCONSTRUCTM;
+
    private:
     Controller();
     Controller(const Controller&) = delete;
     ~Controller();
-    static Controller s_instance;
+    static inline auto& getInstance() {
+        static Controller s_instance;
+        return s_instance;
+    }
 
     // state members
     IScreen* mp_curScreen;
@@ -25,18 +31,20 @@ class Controller {
     uint64_t m_keysDown;
     uint64_t m_keysHeld;
 
+    lv_style_t m_globalStyle;
+
     // helpers
     inline void mountScreen_(IScreen* screenToMount);
     void threadMain_();
 
    public:
     static void show(IScreen& screenToShow);
-    inline static void stop() {
-        s_instance.m_shouldExit = true;
-    }
+    inline static void stop() { getInstance().m_shouldExit = true; }
 
-    inline static uint64_t getKeysDown() { return s_instance.m_keysDown; }
-    inline static uint64_t getKeysHeld() { return s_instance.m_keysHeld; }
+    inline static uint64_t getKeysDown() { return getInstance().m_keysDown; }
+    inline static uint64_t getKeysHeld() { return getInstance().m_keysHeld; }
+
+    inline static lv_style_t* globalStylePtr() { return &getInstance().m_globalStyle; }
 };
 
 }  // namespace ui

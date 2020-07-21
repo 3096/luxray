@@ -3,10 +3,13 @@
 #include <memory>
 
 #include "../core/time.hpp"
+#include "../debug.hpp"
 #include "../ui/basic_screen_provider.hpp"
 #include "../ui/i_screen.hpp"
 
 class TimeScreen : public ui::IScreen {
+    LOGCONSTRUCTM;
+
    private:
     TimeScreen();
     TimeScreen(const TimeScreen&) = delete;

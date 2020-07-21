@@ -6,7 +6,9 @@
 
 TimeErrorScreen TimeErrorScreen::s_instance;
 
-TimeErrorScreen::TimeErrorScreen() : ui::IScreen() {
+TimeErrorScreen::TimeErrorScreen() {
+    LOGSL("constructing... ");
+
     mp_errorMsgLabel = lv_label_create(getLvScreenObj(), nullptr);
     lv_label_set_text(mp_errorMsgLabel,
                       "To use the Date Advance\n"
@@ -16,7 +18,7 @@ TimeErrorScreen::TimeErrorScreen() : ui::IScreen() {
     lv_obj_align(mp_errorMsgLabel, nullptr, LV_ALIGN_CENTER, 0, 0);
     m_basicScreen.addLvObjPositionUpdater(mp_errorMsgLabel, lv_obj_realign);
 
-    LOG("TimeErrorScreen initialized");
+    LOGEL("done");
 }
 
 TimeErrorScreen::~TimeErrorScreen() {}

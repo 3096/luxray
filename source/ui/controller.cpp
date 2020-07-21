@@ -4,21 +4,20 @@
 #include <stdexcept>
 
 #include "../core/system.hpp"
-#include "../debug.hpp"
 #include "../overlay.hpp"
 
 namespace ui {
 
-Controller Controller::s_instance;
-
 Controller::Controller()
-    : mp_curScreen(nullptr),
+    : LOGCONSTRUCTSL mp_curScreen(nullptr),
       mp_nextScreen(nullptr),
       m_screenIsJustToggled(false),
       m_screenIsOn(true),
       m_shouldRerender(true),
       m_shouldExit(false) {
-    LOG("ui::Controller initialized");
+    lv_style_init(&m_globalStyle);
+
+    LOGEL("done");
 }
 
 Controller::~Controller() {}
@@ -78,6 +77,7 @@ void Controller::threadMain_() {
             }
 
             if (m_shouldRerender) {
+                lv_obj_invalidate(mp_curScreen->getLvScreenObj());
                 mp_curScreen->renderScreen();
                 m_shouldRerender = false;
             }
@@ -92,6 +92,7 @@ void Controller::threadMain_() {
 }
 
 void Controller::show(IScreen& screenToShow) {
+    auto& s_instance = getInstance();
     if (s_instance.mp_curScreen == nullptr) {
         s_instance.mp_curScreen = &screenToShow;
         s_instance.threadMain_();  // TODO: create ui thread instead of just calling

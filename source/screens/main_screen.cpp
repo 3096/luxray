@@ -3,14 +3,13 @@
 #include <switch.h>
 
 #include "../core/system.hpp"
-#include "../debug.hpp"
 #include "../ui/controller.hpp"
 #include "time_error_screen.hpp"
 #include "time_screen.hpp"
 
 MainScreen MainScreen::s_instance;
 
-MainScreen::MainScreen() : m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
+MainScreen::MainScreen() : LOGCONSTRUCTSL m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
     // list of buttons to different screens
     mp_screenListObj = lv_list_create(getLvScreenObj(), nullptr);
     lv_obj_align(mp_screenListObj, nullptr, LV_ALIGN_CENTER, 0, 0);
@@ -22,7 +21,7 @@ MainScreen::MainScreen() : m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
 
     lv_group_add_obj(getLvInputGroup(), mp_screenListObj);
 
-    LOG("MainScreen initialized");
+    LOGEL("done");
 }
 
 MainScreen::~MainScreen() {}

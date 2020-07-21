@@ -12,7 +12,7 @@
 TimeScreen TimeScreen::s_instance;
 
 TimeScreen::TimeScreen()
-    : mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
+    : LOGCONSTRUCT mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
       m_doAutoReset(true),
       m_isInStepDays(false),
       m_isAlreadyNTP(false),
@@ -51,7 +51,7 @@ TimeScreen::TimeScreen()
 
     lv_group_add_obj(getLvInputGroup(), mp_buttonMatrix);
 
-    LOG("TimeScreen initialized");
+    LOG("constructed");
 }
 
 TimeScreen::~TimeScreen() {}

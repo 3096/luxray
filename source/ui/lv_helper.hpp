@@ -28,8 +28,8 @@ static inline auto HEADER_HEIGHT() { return Overlay::getScaledRenderCoord(50); }
 inline void updateHeader(lv_obj_t* p_lvWin) { lv_win_set_header_height(p_lvWin, HEADER_HEIGHT()); }
 
 inline void updateFitParent(lv_obj_t* p_lvWin) {
-    updateHeader(p_lvWin);
     lv::updateFitParent(p_lvWin);
+    updateHeader(p_lvWin);
 }
 
 }  // namespace lv_win

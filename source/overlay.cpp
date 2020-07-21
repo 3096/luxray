@@ -16,6 +16,8 @@ lv_indev_t* gp_keyIn;
 lv_indev_t* gp_touchIn;
 
 Overlay::Overlay() {
+    LOGSL("constructing... ");
+
     TRY_GOTO(viOpenDefaultDisplay(&m_viDisplay), end);
     TRY_GOTO(viGetDisplayVsyncEvent(&m_viDisplay, &m_viDisplayVsyncEvent), close_display);
     TRY_GOTO(viCreateManagedLayer(&m_viDisplay, (ViLayerFlags)0, 0, &__nx_vi_layer_id),
@@ -33,7 +35,7 @@ Overlay::Overlay() {
     mp_frameBuffers[0] = m_frameBufferInfo.buf;
     mp_frameBuffers[1] = (lv_color_t*)m_frameBufferInfo.buf + LAYER_BUFFER_SIZE;
 
-    LOG("libnx initialized");
+    LOGML("libnx initialized... ");
 
     lv_init();
     lv_disp_drv_init(&m_dispDrv);
@@ -44,7 +46,7 @@ Overlay::Overlay() {
     try {
         setLayerSizeAndPosition_();
     } catch (std::runtime_error& e) {
-        LOG("%s", e.what());
+        LOGEL("%s", e.what());
         goto close_fb;
     }
     mp_disp = lv_disp_drv_register(&m_dispDrv);
@@ -59,10 +61,7 @@ Overlay::Overlay() {
     m_keyDrv.read_cb = keysRead_;
     gp_keyIn = lv_indev_drv_register(&m_keyDrv);
 
-    // TODO: fix theme
-    // lv_theme_set_act(theme::getTheme());
-
-    LOG("lv initialized");
+    LOGEL("lv initialized... all done");
 
     m_doRender = true;
     return;
@@ -80,7 +79,7 @@ end:
 }
 
 Overlay::~Overlay() {
-    LOG("Exit Overlay");
+    LOGSL("Exit Overlay...");
 
     eventClose(&m_viDisplayVsyncEvent);
     framebufferClose(&m_frameBufferInfo);
@@ -88,6 +87,8 @@ Overlay::~Overlay() {
     viDestroyManagedLayer(&m_viLayer);
     viCloseDisplay(&m_viDisplay);
     viExit();
+
+    LOGEL("done");
 }
 
 void Overlay::copyPrivFb_() {
