@@ -44,7 +44,6 @@ class Overlay {
     lv_color_t mp_renderBuf[LAYER_BUFFER_SIZE];
     lv_indev_drv_t m_touchDrv;
     lv_indev_drv_t m_keyDrv;
-    lv_theme_t* mp_theme;
 
     // state members
     void* mp_frameBuffers[2];

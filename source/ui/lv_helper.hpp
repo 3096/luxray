@@ -3,6 +3,7 @@
 #include "../debug.hpp"
 #include "../lvgl/lvgl.h"
 #include "../overlay.hpp"
+#include "controller.hpp"
 
 namespace ui {
 
@@ -21,9 +22,25 @@ inline void updateFitParent(lv_obj_t* p_lvObj) {
 
 }  // namespace lv
 
+namespace lv_label {
+
+inline auto create(lv_obj_t* p_parent) {
+    auto result = lv_label_create(p_parent, nullptr);
+    lv_obj_add_style(result, LV_OBJ_PART_MAIN, ui::Controller::getFontStyleNormal());
+    return result;
+}
+
+}  // namespace lv_label
+
 namespace lv_win {
 
-static inline auto HEADER_HEIGHT() { return Overlay::getScaledRenderCoord(50); }
+inline auto HEADER_HEIGHT() { return Overlay::getScaledRenderCoord(50); }
+
+inline auto create(lv_obj_t* p_parent) {
+    auto result = lv_win_create(p_parent, nullptr);
+    lv_obj_add_style(result, LV_WIN_PART_HEADER, ui::Controller::getFontStyleNormal());
+    return result;
+}
 
 inline void updateHeader(lv_obj_t* p_lvWin) { lv_win_set_header_height(p_lvWin, HEADER_HEIGHT()); }
 
@@ -33,5 +50,15 @@ inline void updateFitParent(lv_obj_t* p_lvWin) {
 }
 
 }  // namespace lv_win
+
+namespace lv_btnmatrix {
+
+inline auto create(lv_obj_t* p_parent) {
+    auto result = lv_btnmatrix_create(p_parent, nullptr);
+    lv_obj_add_style(result, LV_BTNMATRIX_PART_BTN, ui::Controller::getFontStyleSmall());
+    return result;
+}
+
+}  // namespace lv_btnmatrix
 
 }  // namespace ui

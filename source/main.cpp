@@ -24,9 +24,9 @@ void __libnx_initheap(void) {
     fake_heap_end = nx_inner_heap + sizeof(nx_inner_heap);
 }
 
-bool g_appInitSuccessful;
+bool g_appInitSuccessful = false;
 void __appInit(void) {
-    g_appInitSuccessful = true;
+    g_appInitSuccessful = true;  // assume success if __appInit is called and no fatal
 
     // Init services
     Result rc;
@@ -35,7 +35,7 @@ void __appInit(void) {
     if (R_FAILED(fsInitialize())) fatalThrow(MAKERESULT(Module_Libnx, LibnxError_InitFail_FS));
     if (R_FAILED(rc = timeInitialize())) {
         // TimeServiceType_System only has 2 available session normally,
-        // so we switch to TimeServiceType_User and flag the failure
+        // so we switch to TimeServiceType_User and flag the failure without fatal
         timeExit();
         g_appInitSuccessful = false;
         __nx_time_service_type = TimeServiceType_User;
@@ -50,21 +50,18 @@ void __appInit(void) {
     if (R_FAILED(fsdevMountSdmc())) fatalThrow(0x5D);
 
     auto socketConfig = SocketInitConfig{.bsdsockets_version = 1,
-
                                          .tcp_tx_buf_size = 0x800,
                                          .tcp_rx_buf_size = 0x1000,
                                          .tcp_tx_buf_max_size = 0,
                                          .tcp_rx_buf_max_size = 0,
-
                                          .udp_tx_buf_size = 0x2400,
                                          .udp_rx_buf_size = 0xA500,
-
                                          .sb_efficiency = 1};
     TRY_FATAL(socketInitialize(&socketConfig));
 
     debugInit();
 
-    LOG("service init");
+    LOGML("\n");
 }
 
 void __appExit(void) {
@@ -87,12 +84,16 @@ void __appExit(void) {
 }
 
 int main(int argc, char* argv[]) {
-    if (not g_appInitSuccessful) {
+    if (g_appInitSuccessful) {
+        LOG("services initialized");
+    } else {
         LOG("__appInit failed");
         return -1;
     }
 
     LOG("Main start");
+
+    // TODO: fix theme
 
     try {
         ui::Controller::show(MainScreen::getInstance());

@@ -35,9 +35,10 @@ Overlay::Overlay() {
     mp_frameBuffers[0] = m_frameBufferInfo.buf;
     mp_frameBuffers[1] = (lv_color_t*)m_frameBufferInfo.buf + LAYER_BUFFER_SIZE;
 
-    LOGML("libnx initialized... ");
+    LOGML("framebuffer initialized... ");
 
     lv_init();
+
     lv_disp_drv_init(&m_dispDrv);
     lv_disp_buf_init(&m_dispBufferInfo, mp_renderBuf, nullptr, LAYER_BUFFER_SIZE);
     m_dispDrv.buffer = &m_dispBufferInfo;

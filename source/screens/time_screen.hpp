@@ -17,10 +17,12 @@ class TimeScreen : public ui::IScreen {
     static TimeScreen s_instance;
 
     // consts
+    static constexpr auto BUTTON_MATRIX_WIDTH = 300;
+    static constexpr auto BUTTON_MATRIX_HEIGHT = 200;
+
     static constexpr const char* STRING_CUR_DATE = "Current Date:";
-    // static constexpr const char* STRING_TARGET_DATE = "Target Date:";
     static constexpr const char* STRING_TARGET_CHANGE = "Target Change:";
-    static constexpr const char* STRING_STEPPING = "Step Remaining:";
+    static constexpr const char* STRING_STEPPING = "Remaining:";
     static constexpr const char* STRING_DAYS = " days";
     // clang-format off
     static constexpr const char* INITIAL_BUTTON_MAP[] = {

@@ -21,23 +21,25 @@ TimeScreen::TimeScreen()
       m_curTargetChange(0),
       m_curTargetSign(1) {
     //
-    lv_obj_t* p_window = lv_win_create(getLvScreenObj(), nullptr);
+    lv_obj_t* p_window = ui::lv_win::create(getLvScreenObj());
     m_basicScreen.addLvObjPositionUpdater(p_window, ui::lv_win::updateFitParent);
     lv_win_set_title(p_window, "  Date Advance");
 
-    mp_promptLabel = lv_label_create(p_window, nullptr);
+    mp_promptLabel = ui::lv_label::create(p_window);
     m_basicScreen.addLvObjPositionUpdater(mp_promptLabel, [](lv_obj_t* mp_promptLabel) {
         lv_obj_align(mp_promptLabel, nullptr, LV_ALIGN_IN_TOP_LEFT, ui::size::MARGIN(), ui::size::MARGIN());
     });
 
-    mp_valueLabel = lv_label_create(p_window, nullptr);
+    mp_valueLabel = ui::lv_label::create(p_window);
     lv_label_set_align(mp_valueLabel, LV_LABEL_ALIGN_RIGHT);
     m_basicScreen.addLvObjPositionUpdater(mp_valueLabel, [](lv_obj_t* mp_valueLabel) {
         lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -ui::size::MARGIN(), ui::size::MARGIN());
     });
 
-    mp_buttonMatrix = lv_btnmatrix_create(p_window, NULL);
+    mp_buttonMatrix = ui::lv_btnmatrix::create(p_window);
     m_basicScreen.addLvObjPositionUpdater(mp_buttonMatrix, [p_window](lv_obj_t* mp_buttonMatrix) {
+        lv_obj_set_size(mp_buttonMatrix, ui::BasicScreenProvider::coord(BUTTON_MATRIX_WIDTH),
+                        ui::BasicScreenProvider::coord(BUTTON_MATRIX_HEIGHT));
         lv_obj_align(mp_buttonMatrix, p_window, LV_ALIGN_IN_BOTTOM_MID, 0, -ui::size::MARGIN());
     });
 

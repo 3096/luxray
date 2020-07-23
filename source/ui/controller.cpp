@@ -15,7 +15,9 @@ Controller::Controller()
       m_screenIsOn(true),
       m_shouldRerender(true),
       m_shouldExit(false) {
-    lv_style_init(&m_globalStyle);
+    lv_style_init(&m_fontStyleNormal);
+    lv_style_init(&m_fontStyleSmall);
+    updateFontStyles_();
 
     LOGEL("done");
 }
@@ -27,6 +29,17 @@ void Controller::mountScreen_(IScreen* screenToMount) {
     lv_indev_set_group(gp_keyIn, screenToMount->getLvInputGroup());
     lv_scr_load(screenToMount->getLvScreenObj());
     m_shouldRerender = true;
+}
+
+void Controller::updateFontStyles_() {
+    // TODO: write a custom shared font renderer
+    if (Overlay::getIsDockedStatus()) {
+        lv_style_set_text_font(&m_fontStyleNormal, LV_STATE_DEFAULT, DOCKED_FONT.normal);
+        lv_style_set_text_font(&m_fontStyleSmall, LV_STATE_DEFAULT, DOCKED_FONT.small);
+    } else {
+        lv_style_set_text_font(&m_fontStyleNormal, LV_STATE_DEFAULT, HANDHELD_FONT.normal);
+        lv_style_set_text_font(&m_fontStyleSmall, LV_STATE_DEFAULT, HANDHELD_FONT.small);
+    }
 }
 
 void Controller::threadMain_() {
@@ -63,8 +76,7 @@ void Controller::threadMain_() {
         }
 
         if (m_screenIsOn) {
-            // check if next screen is requested
-            if (mp_nextScreen) {
+            if (mp_nextScreen) {  // check if next screen is requested
                 mp_curScreen->unmount();
                 mountScreen_(mp_nextScreen);
 
@@ -73,10 +85,12 @@ void Controller::threadMain_() {
             }
 
             if (Overlay::getIsDockedStatusChanged()) {
+                updateFontStyles_();
                 m_shouldRerender = true;
             }
 
             if (m_shouldRerender) {
+                lv_obj_refresh_style(mp_curScreen->getLvScreenObj(), LV_STYLE_PROP_ALL);
                 lv_obj_invalidate(mp_curScreen->getLvScreenObj());
                 mp_curScreen->renderScreen();
                 m_shouldRerender = false;

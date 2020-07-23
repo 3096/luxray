@@ -68,7 +68,7 @@ ASFLAGS		:=	-g $(ARCH)
 
 LDFLAGS		:=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS		:=	-lnx -lstratosphere
+LIBS		:=	-lnx
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

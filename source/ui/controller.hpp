@@ -19,6 +19,18 @@ class Controller {
         return s_instance;
     }
 
+    struct LvFonts {
+        lv_font_t* normal;
+        lv_font_t* small;
+    };
+
+    static constexpr auto DOCKED_FONT = LvFonts OVERLAY_FONT_DOCKED;
+    static constexpr auto HANDHELD_FONT = LvFonts OVERLAY_FONT_HANDHELD;
+
+    // controlled styles
+    lv_style_t m_fontStyleNormal;
+    lv_style_t m_fontStyleSmall;
+
     // state members
     IScreen* mp_curScreen;
     IScreen* mp_nextScreen;
@@ -31,10 +43,9 @@ class Controller {
     uint64_t m_keysDown;
     uint64_t m_keysHeld;
 
-    lv_style_t m_globalStyle;
-
     // helpers
     inline void mountScreen_(IScreen* screenToMount);
+    inline void updateFontStyles_();
     void threadMain_();
 
    public:
@@ -44,7 +55,8 @@ class Controller {
     inline static uint64_t getKeysDown() { return getInstance().m_keysDown; }
     inline static uint64_t getKeysHeld() { return getInstance().m_keysHeld; }
 
-    inline static lv_style_t* globalStylePtr() { return &getInstance().m_globalStyle; }
+    inline static auto getFontStyleNormal() { return &(getInstance().m_fontStyleNormal); }
+    inline static auto getFontStyleSmall() { return &(getInstance().m_fontStyleSmall); }
 };
 
 }  // namespace ui
