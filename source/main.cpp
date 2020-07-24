@@ -1,6 +1,6 @@
 #include "debug.hpp"
-#include "lvgl/lvgl.h"
 #include "screens/main_screen.hpp"
+#include "theme.hpp"
 #include "ui/controller.hpp"
 #include "util.hpp"
 
@@ -60,8 +60,9 @@ void __appInit(void) {
     TRY_FATAL(socketInitialize(&socketConfig));
 
     debugInit();
-
     LOGML("\n");
+
+    theme::initialize();
 }
 
 void __appExit(void) {
@@ -92,8 +93,6 @@ int main(int argc, char* argv[]) {
     }
 
     LOG("Main start");
-
-    // TODO: fix theme
 
     try {
         ui::Controller::show(MainScreen::getInstance());

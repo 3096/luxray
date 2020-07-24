@@ -1,10 +1,12 @@
 #pragma once
 
-#include "lvgl/lvgl.h"
+#include "ui/lv_helper.hpp"
 
 namespace theme {
 
-lv_theme_t* getTheme();
-void focusStyleMod(lv_group_t* group, lv_style_t* style);
+void initialize();
 
-}  // namespace Theme
+auto createWindow(lv_obj_t* p_parent) -> lv_obj_t*;
+auto createBtnmatrix(lv_obj_t* p_parent) -> lv_obj_t*;
+
+}  // namespace theme

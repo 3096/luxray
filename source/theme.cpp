@@ -2,57 +2,52 @@
 
 namespace theme {
 
-// TODO: fix theme
-// lv_theme_t* getTheme() {
-//     // TODO: refactor repeated values
-//     lv_theme_t* theme = lv_theme_material_init(200, nullptr);
-//     theme->style.scr->body.main_color = {0, 0, 0, 0x7F};
-//     theme->style.scr->body.grad_color = {0, 0, 0, 0x7F};
-//     theme->style.scr->text.color = LV_COLOR_WHITE;
+constexpr auto LUXRAY_BLUE = 0x1976D2;
+constexpr auto LUXRAY_GOLD = 0xFFD600;
+constexpr auto LUXRAY_GREY = 0x263238;
 
-//     theme->style.win.header->body.main_color = lv_color_hex(0x1976D2);
-//     theme->style.win.header->body.grad_color = lv_color_hex(0x1976D2);
-//     theme->style.win.header->text.color = LV_COLOR_WHITE;
-//     theme->style.win.bg = &lv_style_transp;
+constexpr auto BORDER_GREY = 0x707070;
+constexpr auto PRESSED_GREY = 0x607D8B;
+constexpr auto CHECKED_GREY = 0x455A64;
+constexpr auto DISABLED_GREY = 0x424242;
 
-//     theme->style.btnm.bg->body.main_color = lv_color_hex(0x263238);
-//     theme->style.btnm.bg->body.grad_color = lv_color_hex(0x263238);
-//     theme->style.btnm.bg->body.border.color = lv_color_hex(0x707070);
-//     theme->style.btnm.bg->body.shadow.color = lv_color_hex(0x707070);
-//     theme->style.btnm.btn.rel->body.border.color = lv_color_hex(0x707070);
-//     theme->style.btnm.btn.rel->text.color = LV_COLOR_WHITE;
-//     theme->style.btnm.btn.pr->body = theme->style.btnm.btn.rel->body;
-//     theme->style.btnm.btn.pr->body.main_color = lv_color_hex(0x607D8B);
-//     theme->style.btnm.btn.pr->body.grad_color = lv_color_hex(0x607D8B);
-//     theme->style.btnm.btn.pr->body.opa = LV_OPA_100;
-//     theme->style.btnm.btn.pr->text = theme->style.btnm.btn.rel->text;
-//     theme->style.btnm.btn.tgl_pr->body = theme->style.btnm.btn.pr->body;
-//     theme->style.btnm.btn.tgl_pr->text = theme->style.btnm.btn.rel->text;
-//     theme->style.btnm.btn.tgl_rel->body = theme->style.btnm.btn.pr->body;
-//     theme->style.btnm.btn.tgl_rel->body.main_color = lv_color_hex(0x455A64);
-//     theme->style.btnm.btn.tgl_rel->body.grad_color = lv_color_hex(0x455A64);
-//     theme->style.btnm.btn.tgl_rel->text = theme->style.btnm.btn.rel->text;
-//     theme->style.btnm.btn.ina->body = theme->style.btnm.btn.rel->body;
-//     theme->style.btnm.btn.ina->text = theme->style.btnm.btn.rel->text;
-//     theme->style.btnm.btn.ina->text.color = lv_color_hex(0x424242);
+lv_style_t luxrayBlueStyle;
 
-//     theme->style.list.bg = theme->style.btnm.bg;
-//     theme->style.list.btn.rel = theme->style.btnm.btn.rel;
-//     theme->style.list.btn.pr = theme->style.btnm.btn.pr;
-//     theme->style.list.btn.tgl_rel = theme->style.btnm.btn.tgl_rel;
-//     theme->style.list.btn.tgl_pr = theme->style.btnm.btn.tgl_pr;
-//     theme->style.list.btn.ina = theme->style.btnm.btn.ina;
+lv_style_t btnmatrixBgStyle;
+lv_style_t btnmatrixBtnStyle;
 
-//     return theme;
-// }
+void initialize() {
+    LOGSL("Initializing... ");
 
-// void focusStyleMod(lv_group_t* group, lv_style_t* style) {
-//     style->body.border.opa = LV_OPA_COVER;
-//     style->body.border.color = lv_color_hex(0xFFD600);
+    ui::lv::initColorStyle(luxrayBlueStyle, lv_color_hex(LUXRAY_BLUE));
 
-//     // If not empty or has border then emphasis the border
-//     if (style->body.opa != LV_OPA_TRANSP or style->body.border.width != 0) style->body.border.width = LV_DPI / 30;
-//     style->body.shadow.color = lv_color_mix(style->body.shadow.color, lv_color_hex(0xFFD600), LV_OPA_60);
-// }
+    ui::lv::initColorStyle(btnmatrixBgStyle, lv_color_hex(LUXRAY_GREY));
+    lv_style_set_border_color(&btnmatrixBgStyle, LV_STATE_DEFAULT, lv_color_hex(BORDER_GREY));
+    lv_style_set_border_color(&btnmatrixBgStyle, LV_STATE_FOCUSED, lv_color_hex(BORDER_GREY));
 
-}  // namespace Theme
+    ui::lv::initColorStyle(btnmatrixBtnStyle, lv_color_hex(LUXRAY_GREY));
+    lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_DEFAULT, lv_color_hex(BORDER_GREY));
+    lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED, lv_color_hex(LUXRAY_GOLD));
+    lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_PRESSED, lv_color_hex(PRESSED_GREY));
+    lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_CHECKED, lv_color_hex(CHECKED_GREY));
+    lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_DISABLED, lv_color_hex(CHECKED_GREY));
+    lv_style_set_text_color(&btnmatrixBtnStyle, LV_STATE_DISABLED, lv_color_hex(DISABLED_GREY));
+
+    LOGEL("done");
+}
+
+auto createWindow(lv_obj_t* p_parent) -> lv_obj_t* {
+    auto result = ui::lv_win::create(p_parent);
+    lv_obj_add_style(result, LV_WIN_PART_HEADER, &luxrayBlueStyle);
+    lv_obj_add_style(result, LV_WIN_PART_BG, ui::Controller::getScreenStyle());
+    return result;
+}
+
+auto createBtnmatrix(lv_obj_t* p_parent) -> lv_obj_t* {
+    auto result = ui::lv_btnmatrix::create(p_parent);
+    lv_obj_add_style(result, LV_BTNMATRIX_PART_BG, &btnmatrixBgStyle);
+    lv_obj_add_style(result, LV_BTNMATRIX_PART_BTN, &btnmatrixBtnStyle);
+    return result;
+}
+
+}  // namespace theme

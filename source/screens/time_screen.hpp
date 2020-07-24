@@ -21,7 +21,7 @@ class TimeScreen : public ui::IScreen {
     static constexpr auto BUTTON_MATRIX_HEIGHT = 200;
 
     static constexpr const char* STRING_CUR_DATE = "Current Date:";
-    static constexpr const char* STRING_TARGET_CHANGE = "Target Change:";
+    static constexpr const char* STRING_TARGET_CHANGE = "Target:";
     static constexpr const char* STRING_STEPPING = "Remaining:";
     static constexpr const char* STRING_DAYS = " days";
     // clang-format off

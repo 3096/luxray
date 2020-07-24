@@ -27,9 +27,12 @@ class Controller {
     static constexpr auto DOCKED_FONT = LvFonts OVERLAY_FONT_DOCKED;
     static constexpr auto HANDHELD_FONT = LvFonts OVERLAY_FONT_HANDHELD;
 
+    static constexpr auto DEFAULT_SCREEN_COLOR = lv_color_t{0, 0, 0, 0x7F};
+
     // controlled styles
     lv_style_t m_fontStyleNormal;
     lv_style_t m_fontStyleSmall;
+    lv_style_t m_screenStyle;
 
     // state members
     IScreen* mp_curScreen;
@@ -57,6 +60,7 @@ class Controller {
 
     inline static auto getFontStyleNormal() { return &(getInstance().m_fontStyleNormal); }
     inline static auto getFontStyleSmall() { return &(getInstance().m_fontStyleSmall); }
+    inline static auto getScreenStyle() { return &(getInstance().m_screenStyle); }
 };
 
 }  // namespace ui

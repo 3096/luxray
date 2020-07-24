@@ -4,8 +4,7 @@ namespace ui {
 
 BasicScreenProvider::BasicScreenProvider()
     : mp_screenObj(lv_obj_create(nullptr, nullptr)), mp_inputGroup(lv_group_create()) {
-    // TODO: fix theme
-    // lv_group_set_style_mod_cb(mp_inputGroup, theme::focusStyleMod);
+    lv_obj_add_style(mp_screenObj, LV_OBJ_PART_MAIN, Controller::getScreenStyle());
 }
 
 BasicScreenProvider::~BasicScreenProvider() {

@@ -5,6 +5,7 @@
 
 #include "../core/system.hpp"
 #include "../overlay.hpp"
+#include "lv_helper.hpp"
 
 namespace ui {
 
@@ -18,6 +19,8 @@ Controller::Controller()
     lv_style_init(&m_fontStyleNormal);
     lv_style_init(&m_fontStyleSmall);
     updateFontStyles_();
+
+    lv::initColorStyle(m_screenStyle, DEFAULT_SCREEN_COLOR);
 
     LOGEL("done");
 }
