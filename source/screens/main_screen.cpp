@@ -3,7 +3,7 @@
 #include <switch.h>
 
 #include "../core/system.hpp"
-#include "../ui/controller.hpp"
+#include "lx/ui/controller.hpp"
 #include "time_error_screen.hpp"
 #include "time_screen.hpp"
 
@@ -42,12 +42,12 @@ void MainScreen::procFrame() {
     }
 
     if (m_shouldExit) {
-        ui::Controller::stop();
+        lx::ui::Controller::stop();
     }
 }
 
-void MainScreen::showScreen_(ui::IScreen& screenToShow) {
-    ui::Controller::show(screenToShow);
+void MainScreen::showScreen_(lx::ui::IScreen& screenToShow) {
+    lx::ui::Controller::show(screenToShow);
     // remove m_screenToShow to show main screen again
     m_screenToShow = NO_SUB_SCREEN;
 }

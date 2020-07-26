@@ -44,9 +44,9 @@ APP_VERSION	:=	w0.1.0
 
 TARGET		:=	luxray
 BUILD		:=	build
-SOURCES		:=	source source/screens source/core source/ui source/lvgl/src/lv_core source/lvgl/src/lv_draw source/lvgl/src/lv_font source/lvgl/src/lv_gpu source/lvgl/src/lv_hal source/lvgl/src/lv_misc source/lvgl/src/lv_themes source/lvgl/src/lv_widgets # temporary until I learn a better way to do this...
+SOURCES		:=	source source/screens source/core libs/libluxio/src libs/libluxio/src/ui libs/libluxio/lvgl/lvgl/src/lv_core libs/libluxio/lvgl/lvgl/src/lv_draw libs/libluxio/lvgl/lvgl/src/lv_font libs/libluxio/lvgl/lvgl/src/lv_gpu libs/libluxio/lvgl/lvgl/src/lv_hal libs/libluxio/lvgl/lvgl/src/lv_misc libs/libluxio/lvgl/lvgl/src/lv_themes libs/libluxio/lvgl/lvgl/src/lv_widgets # temporary until I learn a better way to do this...
 DATA		:=	data
-INCLUDES	:=	include
+INCLUDES	:=	source libs/libluxio/include libs/libluxio/lvgl/lvgl
 #ROMFS	:=	romfs
 
 GITREV  := $(shell git rev-parse HEAD)

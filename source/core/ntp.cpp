@@ -40,7 +40,7 @@ information. */
 #include <stdexcept>
 #include <string>
 
-#include "../debug.hpp"
+#include "lx/debug.hpp"
 
 time_t ntpGetTime() {
     static const char* SERVER_NAME = "0.pool.ntp.org";

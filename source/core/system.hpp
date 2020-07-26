@@ -6,6 +6,4 @@ bool nifmInternetIsConnected();
 
 bool setsysInternetTimeSyncIsOn();
 
-bool apmConsoleIsDocked();
-
 }  // namespace os

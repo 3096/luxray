@@ -1,11 +1,11 @@
-#include <stdexcept>
+#include "time.hpp"
 
 #include <switch.h>
 
-#include "../debug.hpp"
-#include "ntp.hpp"
+#include <stdexcept>
 
-#include "time.hpp"
+#include "lx/debug.hpp"
+#include "ntp.hpp"
 
 TimeTaskHandler::TimeTaskHandler()
     : STEP_INTERVAL_TICKS(STEP_INTERVAL * armGetSystemTickFreq()),

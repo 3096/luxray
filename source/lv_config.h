@@ -14,7 +14,7 @@
 /* clang-format off */
 
 #include <stdint.h>
-#include "layer_info.h"
+#include "lx/layer_info.h"
 
 /*====================
    Graphical settings

@@ -6,8 +6,8 @@
 #include "../core/system.hpp"
 #include "../screens/main_screen.hpp"
 #include "../theme.hpp"
-#include "../ui/controller.hpp"
-#include "../ui/lv_helper.hpp"
+#include "lx/ui/controller.hpp"
+#include "lx/ui/lv_helper.hpp"
 
 TimeScreen TimeScreen::s_instance;
 
@@ -22,25 +22,25 @@ TimeScreen::TimeScreen()
       m_curTargetSign(1) {
     //
     lv_obj_t* p_window = theme::createWindow(getLvScreenObj());
-    m_basicScreen.addLvObjPositionUpdater(p_window, ui::lv_win::updateFitParent);
+    m_basicScreen.addLvObjPositionUpdater(p_window, lx::ui::lv_win::updateFitParent);
     lv_win_set_title(p_window, "  Date Advance");
 
-    mp_promptLabel = ui::lv_label::create(p_window);
+    mp_promptLabel = lx::ui::lv_label::create(p_window);
     m_basicScreen.addLvObjPositionUpdater(mp_promptLabel, [](lv_obj_t* mp_promptLabel) {
-        lv_obj_align(mp_promptLabel, nullptr, LV_ALIGN_IN_TOP_LEFT, ui::size::MARGIN(), ui::size::MARGIN());
+        lv_obj_align(mp_promptLabel, nullptr, LV_ALIGN_IN_TOP_LEFT, lx::ui::size::MARGIN(), lx::ui::size::MARGIN());
     });
 
-    mp_valueLabel = ui::lv_label::create(p_window);
+    mp_valueLabel = lx::ui::lv_label::create(p_window);
     lv_label_set_align(mp_valueLabel, LV_LABEL_ALIGN_RIGHT);
     m_basicScreen.addLvObjPositionUpdater(mp_valueLabel, [](lv_obj_t* mp_valueLabel) {
-        lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -ui::size::MARGIN(), ui::size::MARGIN());
+        lv_obj_align(mp_valueLabel, nullptr, LV_ALIGN_IN_TOP_RIGHT, -lx::ui::size::MARGIN(), lx::ui::size::MARGIN());
     });
 
     mp_buttonMatrix = theme::createBtnmatrix(p_window);
     m_basicScreen.addLvObjPositionUpdater(mp_buttonMatrix, [p_window](lv_obj_t* mp_buttonMatrix) {
-        lv_obj_set_size(mp_buttonMatrix, ui::BasicScreenProvider::coord(BUTTON_MATRIX_WIDTH),
-                        ui::BasicScreenProvider::coord(BUTTON_MATRIX_HEIGHT));
-        lv_obj_align(mp_buttonMatrix, p_window, LV_ALIGN_IN_BOTTOM_MID, 0, -ui::size::MARGIN());
+        lv_obj_set_size(mp_buttonMatrix, lx::ui::BasicScreenProvider::coord(BUTTON_MATRIX_WIDTH),
+                        lx::ui::BasicScreenProvider::coord(BUTTON_MATRIX_HEIGHT));
+        lv_obj_align(mp_buttonMatrix, p_window, LV_ALIGN_IN_BOTTOM_MID, 0, -lx::ui::size::MARGIN());
     });
 
     std::memcpy(m_buttonMap, INITIAL_BUTTON_MAP, sizeof(INITIAL_BUTTON_MAP));
@@ -64,7 +64,7 @@ void TimeScreen::renderScreen() {
 }
 
 void TimeScreen::procFrame() {
-    Overlay::pauseRendering();  // lv tries to draw text before it knows where, smh
+    // lx::Overlay::pauseRendering();  // lv tries to draw text before it knows where, smh
 
     // handle task, needed every frame
     mp_timeTaskHandler->handleTask();
@@ -88,10 +88,10 @@ void TimeScreen::procFrame() {
         m_internetIsConnected = !m_internetIsConnected;
     }
 
-    Overlay::resumeRendering();
+    // lx::Overlay::resumeRendering();
 
     if (m_basicScreen.returnButtonPressed() and not m_isInStepDays) {
-        ui::Controller::show(MainScreen::getInstance());
+        lx::ui::Controller::show(MainScreen::getInstance());
     }
 }
 

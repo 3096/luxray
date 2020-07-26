@@ -1,16 +1,16 @@
 #pragma once
 
-#include "../ui/basic_screen_provider.hpp"
-#include "../ui/i_screen.hpp"
+#include "lx/ui/basic_screen_provider.hpp"
+#include "lx/ui/i_screen.hpp"
 
-class TimeErrorScreen : public ui::IScreen {
+class TimeErrorScreen : public lx::ui::IScreen {
    private:
     TimeErrorScreen();
     TimeErrorScreen(const TimeErrorScreen&) = delete;
     ~TimeErrorScreen();
     static TimeErrorScreen s_instance;
 
-    ui::BasicScreenProvider m_basicScreen;
+    lx::ui::BasicScreenProvider m_basicScreen;
 
     lv_obj_t* mp_errorMsgLabel;
 

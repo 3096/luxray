@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui/lv_helper.hpp"
+#include "lx/ui/lv_helper.hpp"
 
 namespace theme {
 

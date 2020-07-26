@@ -19,13 +19,13 @@ lv_style_t btnmatrixBtnStyle;
 void initialize() {
     LOGSL("Initializing... ");
 
-    ui::lv::initColorStyle(luxrayBlueStyle, lv_color_hex(LUXRAY_BLUE));
+    lx::ui::lv::initColorStyle(luxrayBlueStyle, lv_color_hex(LUXRAY_BLUE));
 
-    ui::lv::initColorStyle(btnmatrixBgStyle, lv_color_hex(LUXRAY_GREY));
+    lx::ui::lv::initColorStyle(btnmatrixBgStyle, lv_color_hex(LUXRAY_GREY));
     lv_style_set_border_color(&btnmatrixBgStyle, LV_STATE_DEFAULT, lv_color_hex(BORDER_GREY));
     lv_style_set_border_color(&btnmatrixBgStyle, LV_STATE_FOCUSED, lv_color_hex(BORDER_GREY));
 
-    ui::lv::initColorStyle(btnmatrixBtnStyle, lv_color_hex(LUXRAY_GREY));
+    lx::ui::lv::initColorStyle(btnmatrixBtnStyle, lv_color_hex(LUXRAY_GREY));
     lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_DEFAULT, lv_color_hex(BORDER_GREY));
     lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED, lv_color_hex(LUXRAY_GOLD));
     lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_PRESSED, lv_color_hex(PRESSED_GREY));
@@ -37,14 +37,14 @@ void initialize() {
 }
 
 auto createWindow(lv_obj_t* p_parent) -> lv_obj_t* {
-    auto result = ui::lv_win::create(p_parent);
+    auto result = lx::ui::lv_win::create(p_parent);
     lv_obj_add_style(result, LV_WIN_PART_HEADER, &luxrayBlueStyle);
-    lv_obj_add_style(result, LV_WIN_PART_BG, ui::Controller::getScreenStyle());
+    lv_obj_add_style(result, LV_WIN_PART_BG, lx::ui::Controller::getScreenStyle());
     return result;
 }
 
 auto createBtnmatrix(lv_obj_t* p_parent) -> lv_obj_t* {
-    auto result = ui::lv_btnmatrix::create(p_parent);
+    auto result = lx::ui::lv_btnmatrix::create(p_parent);
     lv_obj_add_style(result, LV_BTNMATRIX_PART_BG, &btnmatrixBgStyle);
     lv_obj_add_style(result, LV_BTNMATRIX_PART_BTN, &btnmatrixBtnStyle);
     return result;

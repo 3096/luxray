@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "../util.hpp"
+#include "lx/util.hpp"
 
 bool os::nifmInternetIsConnected() {
     NifmInternetConnectionStatus nifmICS;
@@ -26,10 +26,4 @@ bool os::setsysInternetTimeSyncIsOn() {
     }
 
     return internetTimeSyncIsOn;
-}
-
-bool os::apmConsoleIsDocked() {
-    ApmPerformanceMode curPerformanceMode;
-    TRY_THROW(apmGetPerformanceMode(&curPerformanceMode));
-    return curPerformanceMode == ApmPerformanceMode_Docked;
 }

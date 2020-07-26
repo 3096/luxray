@@ -3,11 +3,11 @@
 #include <memory>
 
 #include "../core/time.hpp"
-#include "../debug.hpp"
-#include "../ui/basic_screen_provider.hpp"
-#include "../ui/i_screen.hpp"
+#include "lx/debug.hpp"
+#include "lx/ui/basic_screen_provider.hpp"
+#include "lx/ui/i_screen.hpp"
 
-class TimeScreen : public ui::IScreen {
+class TimeScreen : public lx::ui::IScreen {
     LOGCONSTRUCTM;
 
    private:
@@ -58,7 +58,7 @@ class TimeScreen : public ui::IScreen {
     static constexpr int MAX_TARGET_CHANGE = 999999;
 
     // composition
-    ui::BasicScreenProvider m_basicScreen;
+    lx::ui::BasicScreenProvider m_basicScreen;
 
     // ui
     std::unique_ptr<TimeTaskHandler> mp_timeTaskHandler;

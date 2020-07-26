@@ -1,7 +1,7 @@
 #include "time_error_screen.hpp"
 
-#include "../debug.hpp"
-#include "../ui/controller.hpp"
+#include "lx/debug.hpp"
+#include "lx/ui/controller.hpp"
 #include "main_screen.hpp"
 
 TimeErrorScreen TimeErrorScreen::s_instance;
@@ -27,6 +27,6 @@ void TimeErrorScreen::renderScreen() { m_basicScreen.renderScreen(); }
 
 void TimeErrorScreen::procFrame() {
     if (m_basicScreen.returnButtonPressed()) {
-        ui::Controller::show(MainScreen::getInstance());
+        lx::ui::Controller::show(MainScreen::getInstance());
     }
 }

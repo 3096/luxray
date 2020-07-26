@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../debug.hpp"
-#include "../ui/basic_screen_provider.hpp"
+#include "lx/debug.hpp"
+#include "lx/ui/basic_screen_provider.hpp"
 
-class MainScreen : public ui::IScreen {
+class MainScreen : public lx::ui::IScreen {
     LOGCONSTRUCTM;
 
    private:
@@ -19,7 +19,7 @@ class MainScreen : public ui::IScreen {
     SubScreen m_screenToShow;
     bool m_shouldExit;
 
-    ui::BasicScreenProvider m_basicScreen;
+    lx::ui::BasicScreenProvider m_basicScreen;
 
     virtual void renderScreen() override;
     virtual void procFrame() override;
@@ -28,7 +28,7 @@ class MainScreen : public ui::IScreen {
     virtual inline lv_group_t* getLvInputGroup() override { return m_basicScreen.getLvInputGroup(); }
 
     // helpers
-    void showScreen_(ui::IScreen& screenToShow);
+    void showScreen_(lx::ui::IScreen& screenToShow);
     void handleShowScreen_(lv_event_t event, SubScreen screenToShow);
 
     // callbacks
