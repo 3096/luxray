@@ -19,19 +19,29 @@ lv_style_t btnmatrixBtnStyle;
 void initialize() {
     LOGSL("Initializing... ");
 
-    lx::ui::lv::initColorStyle(luxrayBlueStyle, lv_color_hex(LUXRAY_BLUE));
+    lx::ui::lv::initBgColorStyle(luxrayBlueStyle, lv_color_hex(LUXRAY_BLUE));
 
-    lx::ui::lv::initColorStyle(btnmatrixBgStyle, lv_color_hex(LUXRAY_GREY));
+    lx::ui::lv::initBgColorStyle(btnmatrixBgStyle, lv_color_hex(LUXRAY_GREY));
     lv_style_set_border_color(&btnmatrixBgStyle, LV_STATE_DEFAULT, lv_color_hex(BORDER_GREY));
     lv_style_set_border_color(&btnmatrixBgStyle, LV_STATE_FOCUSED, lv_color_hex(BORDER_GREY));
+    lv_style_set_border_color(&btnmatrixBgStyle, LV_STATE_CHECKED, lv_color_hex(LUXRAY_BLUE));
 
-    lx::ui::lv::initColorStyle(btnmatrixBtnStyle, lv_color_hex(LUXRAY_GREY));
+    lx::ui::lv::initBgColorStyle(btnmatrixBtnStyle, lv_color_hex(LUXRAY_GREY));
     lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_DEFAULT, lv_color_hex(BORDER_GREY));
-    lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED, lv_color_hex(LUXRAY_GOLD));
     lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_PRESSED, lv_color_hex(PRESSED_GREY));
     lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_CHECKED, lv_color_hex(CHECKED_GREY));
     lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_DISABLED, lv_color_hex(CHECKED_GREY));
     lv_style_set_text_color(&btnmatrixBtnStyle, LV_STATE_DISABLED, lv_color_hex(DISABLED_GREY));
+
+    lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED, lv_color_hex(LUXRAY_GOLD));
+    lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED | LV_STATE_PRESSED, lv_color_hex(LUXRAY_GOLD));
+    lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED | LV_STATE_CHECKED, lv_color_hex(LUXRAY_BLUE));
+    lv_style_set_border_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED | LV_STATE_DISABLED, lv_color_hex(LUXRAY_GOLD));
+
+    lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED | LV_STATE_PRESSED, lv_color_hex(PRESSED_GREY));
+    lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED | LV_STATE_CHECKED, lv_color_hex(LUXRAY_GOLD));
+    lv_style_set_bg_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED | LV_STATE_DISABLED, lv_color_hex(CHECKED_GREY));
+    // lv_style_set_text_color(&btnmatrixBtnStyle, LV_STATE_FOCUSED | LV_STATE_DISABLED, lv_color_hex(DISABLED_GREY));
 
     LOGEL("done");
 }

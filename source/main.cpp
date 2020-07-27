@@ -79,10 +79,6 @@ void __appExit(void) {
     fsExit();
     hidExit();
     smExit();
-
-#ifdef TESLA
-    envSetNextLoad("sdmc:/switch/.overlays/ovlmenu.ovl", "--skipCombo");
-#endif
 }
 
 int main(int argc, char* argv[]) {

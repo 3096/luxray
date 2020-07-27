@@ -21,6 +21,5 @@
 #define OVERLAY_FONT_HANDHELD           { .normal = &lv_font_montserrat_24, .small = &lv_font_montserrat_20 }
 
 // debug options
-#define NDEBUG
 // #define DEBUG_LOG_FILE
-// #define DEBUG_NX_LINK
+#define DEBUG_NX_LINK

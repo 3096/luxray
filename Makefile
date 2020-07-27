@@ -39,20 +39,25 @@ include $(DEVKITPRO)/libnx/switch_rules
 #---------------------------------------------------------------------------------
 
 APP_TITLE	:=	Luxray
+APP_TITLEID :=  0100000000000195
 APP_AUTHOR	:=	3096
 APP_VERSION	:=	w0.1.0
 
 TARGET		:=	luxray
 BUILD		:=	build
-SOURCES		:=	source source/screens source/core libs/libluxio/src libs/libluxio/src/ui libs/libluxio/lvgl/lvgl/src/lv_core libs/libluxio/lvgl/lvgl/src/lv_draw libs/libluxio/lvgl/lvgl/src/lv_font libs/libluxio/lvgl/lvgl/src/lv_gpu libs/libluxio/lvgl/lvgl/src/lv_hal libs/libluxio/lvgl/lvgl/src/lv_misc libs/libluxio/lvgl/lvgl/src/lv_themes libs/libluxio/lvgl/lvgl/src/lv_widgets # temporary until I learn a better way to do this...
+INCLUDES	:=	source include libs/libluxio/include libs/libluxio/lvgl/lvgl
+ifneq ($(BUILD),$(notdir $(CURDIR)))
+SOURCES		:=	$(shell find source libs/libluxio/src libs/libluxio/lvgl/lvgl/src -type d)
+endif
 DATA		:=	data
-INCLUDES	:=	source libs/libluxio/include libs/libluxio/lvgl/lvgl
 #ROMFS	:=	romfs
 
-GITREV  := $(shell git rev-parse HEAD)
+GITREV  := $(shell git rev-parse HEAD | cut -c1-8)
 ifneq ($(GITREV),)
 APP_VERSION := $(APP_VERSION)-$(GITREV)
 endif
+
+NO_ICON = TRUE
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -61,6 +66,10 @@ ARCH		:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
 CFLAGS		:=	-g -Wall -O2 -ffunction-sections \
 				$(ARCH) $(DEFINES) $(INCLUDE) -D__SWITCH__
+
+ifeq ($(strip $(ENABLED_DEBUG)),)
+CFLAGS		+=	-DNDEBUG
+endif
 
 CXXFLAGS	:=	$(CFLAGS) -std=c++17 -fno-rtti
 
@@ -164,7 +173,7 @@ ifneq ($(ROMFS),)
 	export NROFLAGS += --romfsdir=$(CURDIR)/$(ROMFS)
 endif
 
-.PHONY: $(BUILD) clean all
+.PHONY: all $(BUILD) debug zip release clean
 
 #---------------------------------------------------------------------------------
 all: $(BUILD)
@@ -174,12 +183,48 @@ $(BUILD):
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
+debug:
+	@$(MAKE) all --no-print-directory ENABLED_DEBUG=true
+
+#---------------------------------------------------------------------------------
+
+TEMP_DIR = release/tmp
+TEMP_DIR_OVL = release/tmp-ovl
+
+zip:
+	@$(MAKE) clean --no-print-directory
+	@$(MAKE) all --no-print-directory
+ifneq ($(strip $(APP_JSON)),)
+	@mkdir -p $(TEMP_DIR)/atmosphere/contents/$(APP_TITLEID)/
+	@cp $(TARGET).nsp $(TEMP_DIR)/atmosphere/contents/$(APP_TITLEID)/exefs.nsp
+	@cp LICENSE $(TEMP_DIR)/
+	@cd $(TEMP_DIR)/; zip tmp.zip LICENSE atmosphere -r
+endif
+	@mkdir -p $(TEMP_DIR_OVL)/switch/.overlays/
+	@cp $(TARGET).nro $(TEMP_DIR_OVL)/switch/.overlays/$(TARGET).ovl
+	@cp LICENSE $(TEMP_DIR_OVL)/
+	@cd $(TEMP_DIR_OVL)/; zip tmp.zip LICENSE switch -r
+
+#---------------------------------------------------------------------------------
+release: zip
+	$(eval RELEASE_DIR = release/$(TARGET)-$(APP_VERSION)-$(shell sha256sum $(TARGET).elf | cut -d " " -f 1))
+	@mkdir -p $(RELEASE_DIR)
+	cp $(TARGET).elf $(RELEASE_DIR)
+ifneq ($(strip $(APP_JSON)),)
+	$(eval RELEASE_HASH = $(shell sha256sum release/tmp/tmp.zip | cut -d " " -f 1))
+	mv $(TEMP_DIR)/tmp.zip $(RELEASE_DIR)/$(TARGET)-$(APP_VERSION)_$(RELEASE_HASH).zip
+	@rm -r $(TEMP_DIR)/
+endif
+	$(eval RELEASE_HASH = $(shell sha256sum $(TEMP_DIR_OVL)/tmp.zip | cut -d " " -f 1))
+	mv $(TEMP_DIR_OVL)/tmp.zip $(RELEASE_DIR)/$(TARGET)-ovlloader-$(APP_VERSION)_$(RELEASE_HASH).zip
+	@rm -r $(TEMP_DIR_OVL)/
+
+#---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-ifeq ($(strip $(APP_JSON)),)
 	@rm -fr $(BUILD) $(TARGET).nro $(TARGET).nacp $(TARGET).elf
-else
-	@rm -fr $(BUILD) $(TARGET).nsp $(TARGET).nso $(TARGET).npdm $(TARGET).elf
+ifneq ($(strip $(APP_JSON)),)
+	@rm -fr $(BUILD) $(TARGET).nsp $(TARGET).nso $(TARGET).npdm
 endif
 
 
@@ -193,8 +238,10 @@ DEPENDS	:=	$(OFILES:.o=.d)
 # main targets
 #---------------------------------------------------------------------------------
 ifeq ($(strip $(APP_JSON)),)
-
 all	:	$(OUTPUT).nro
+else
+all	:	$(OUTPUT).nro $(OUTPUT).nsp
+endif
 
 ifeq ($(strip $(NO_NACP)),)
 $(OUTPUT).nro	:	$(OUTPUT).elf $(OUTPUT).nacp
@@ -202,15 +249,9 @@ else
 $(OUTPUT).nro	:	$(OUTPUT).elf
 endif
 
-else
-
-all	:	$(OUTPUT).nsp
-
 $(OUTPUT).nsp	:	$(OUTPUT).nso $(OUTPUT).npdm
 
 $(OUTPUT).nso	:	$(OUTPUT).elf
-
-endif
 
 $(OUTPUT).elf	:	$(OFILES)
 
