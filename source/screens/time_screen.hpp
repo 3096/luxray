@@ -88,6 +88,8 @@ class TimeScreen : public lx::ui::IScreen {
     void updateLabels_();
 
     // interface
+    virtual inline void onMount(lx::ui::IScreen* prevScreen) override { return m_basicScreen.onMount(prevScreen); }
+
     virtual void renderScreen() override;
     virtual void procFrame() override;
 

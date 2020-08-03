@@ -90,8 +90,8 @@ void TimeScreen::procFrame() {
 
     // lx::Overlay::resumeRendering();
 
-    if (m_basicScreen.returnButtonPressed() and not m_isInStepDays) {
-        lx::ui::Controller::show(MainScreen::getInstance());
+    if (not m_isInStepDays) {
+        m_basicScreen.processReturn();
     }
 }
 

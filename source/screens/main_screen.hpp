@@ -7,6 +7,12 @@ class MainScreen : public lx::ui::IScreen {
     LOGCONSTRUCTM;
 
    private:
+    static constexpr auto TIME_SETTING_ERROR_MSG =
+        "To use the Date Advance\n"
+        "feature, turn on\n"
+        "\"Synchronize Clock via\n"
+        "Internet\" in System Settings.";
+
     MainScreen();
     MainScreen(const MainScreen&) = delete;
     ~MainScreen();
@@ -20,6 +26,8 @@ class MainScreen : public lx::ui::IScreen {
     bool m_shouldExit;
 
     lx::ui::BasicScreenProvider m_basicScreen;
+
+    virtual inline void onMount(lx::ui::IScreen* prevScreen) override { return m_basicScreen.onMount(prevScreen); }
 
     virtual void renderScreen() override;
     virtual void procFrame() override;

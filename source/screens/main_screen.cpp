@@ -3,8 +3,8 @@
 #include <switch.h>
 
 #include "../core/system.hpp"
+#include "error_screen.hpp"
 #include "lx/ui/controller.hpp"
-#include "time_error_screen.hpp"
 #include "time_screen.hpp"
 
 MainScreen MainScreen::s_instance;
@@ -34,7 +34,7 @@ void MainScreen::procFrame() {
             if (os::setsysInternetTimeSyncIsOn()) {
                 showScreen_(TimeScreen::getInstance());
             } else {
-                showScreen_(TimeErrorScreen::getInstance());
+                showScreen_(ErrorScreen::getInstance(TIME_SETTING_ERROR_MSG));
             }
             break;
         default:
