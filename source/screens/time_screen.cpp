@@ -12,7 +12,8 @@
 TimeScreen TimeScreen::s_instance;
 
 TimeScreen::TimeScreen()
-    : LOGCONSTRUCT mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
+    : LOGCONSTRUCT m_basicScreen(*this),
+      mp_timeTaskHandler(std::make_unique<TimeTaskHandler>()),
       m_doAutoReset(true),
       m_isInStepDays(false),
       m_isAlreadyNTP(false),

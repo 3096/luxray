@@ -18,14 +18,14 @@ class MainScreen : public lx::ui::IScreen {
     ~MainScreen();
     static MainScreen s_instance;
 
+    lx::ui::BasicScreenProvider m_basicScreen;
+
     enum SubScreen { TIME_SCREEN = 0, NO_SUB_SCREEN };
 
     lv_obj_t* mp_screenListObj;
 
     SubScreen m_screenToShow;
     bool m_shouldExit;
-
-    lx::ui::BasicScreenProvider m_basicScreen;
 
     virtual inline void onMount(lx::ui::IScreen* prevScreen) override { return m_basicScreen.onMount(prevScreen); }
 

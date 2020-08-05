@@ -7,7 +7,7 @@
 
 ErrorScreen ErrorScreen::s_instance;
 
-ErrorScreen::ErrorScreen() {
+ErrorScreen::ErrorScreen() : m_basicScreen(*this) {
     LOGSL("constructing... ");
 
     mp_errorMsgLabel = lx::ui::lv_label::create(getLvScreenObj());

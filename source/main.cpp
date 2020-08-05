@@ -61,7 +61,7 @@ void __appInit(void) {
     TRY_FATAL(socketInitialize(&socketConfig));
 
     lx::debugInit();
-    lx::Overlay::initialize();
+    lx::Overlay::instantiate();
 
     theme::initialize();
 }

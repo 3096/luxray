@@ -9,7 +9,7 @@
 
 MainScreen MainScreen::s_instance;
 
-MainScreen::MainScreen() : LOGCONSTRUCTSL m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
+MainScreen::MainScreen() : LOGCONSTRUCTSL m_basicScreen(*this), m_screenToShow(NO_SUB_SCREEN), m_shouldExit(false) {
     // list of buttons to different screens
     mp_screenListObj = lv_list_create(getLvScreenObj(), nullptr);
     lv_obj_align(mp_screenListObj, nullptr, LV_ALIGN_CENTER, 0, 0);
