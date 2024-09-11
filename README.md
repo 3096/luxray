@@ -23,7 +23,7 @@ Usage
 - Open Luxray Launcher from Homebrew Menu and launch Luxray
 
 For detailed usage explanation, please refer to [this page](docs/date_advance.md). <br>
-For further assistance, please join our [Discord server](https://discord.gg/v8Rueaf).
+For further assistance, please join our [Discord server](https://discord.gg/BFEuuaBNR4).
 
 Building
 ---

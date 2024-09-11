@@ -39,8 +39,8 @@ TimeScreen::TimeScreen()
 
     mp_buttonMatrix = theme::createBtnmatrix(p_window);
     m_basicScreen.addLvObjPositionUpdater(mp_buttonMatrix, [p_window](lv_obj_t* mp_buttonMatrix) {
-        lv_obj_set_size(mp_buttonMatrix, lx::ui::BasicScreenProvider::coord(BUTTON_MATRIX_WIDTH),
-                        lx::ui::BasicScreenProvider::coord(BUTTON_MATRIX_HEIGHT));
+        lv_obj_set_size(mp_buttonMatrix, lx::ui::size::coord(BUTTON_MATRIX_WIDTH),
+                        lx::ui::size::coord(BUTTON_MATRIX_HEIGHT));
         lv_obj_align(mp_buttonMatrix, p_window, LV_ALIGN_IN_BOTTOM_MID, 0, -lx::ui::size::MARGIN());
     });
 

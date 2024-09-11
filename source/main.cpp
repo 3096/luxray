@@ -50,14 +50,15 @@ void __appInit(void) {
     __libnx_init_time();
     if (R_FAILED(fsdevMountSdmc())) fatalThrow(0x5D);
 
-    auto socketConfig = SocketInitConfig{.bsdsockets_version = 1,
-                                         .tcp_tx_buf_size = 0x800,
+    auto socketConfig = SocketInitConfig{.tcp_tx_buf_size = 0x800,
                                          .tcp_rx_buf_size = 0x1000,
                                          .tcp_tx_buf_max_size = 0,
                                          .tcp_rx_buf_max_size = 0,
                                          .udp_tx_buf_size = 0x2400,
                                          .udp_rx_buf_size = 0xA500,
-                                         .sb_efficiency = 1};
+                                         .sb_efficiency = 1,
+                                         .num_bsd_sessions = 3,
+                                         .bsd_service_type = BsdServiceType_Auto};
     TRY_FATAL(socketInitialize(&socketConfig));
 
     lx::debugInit();

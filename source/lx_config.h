@@ -1,4 +1,5 @@
 #pragma once
+// clang-format off
 
 #define INNER_HEAP_SIZE                 0x300000
 
@@ -21,16 +22,20 @@
 #define OVERLAY_FONT_HANDHELD           { .normal = &lv_font_montserrat_24, .small = &lv_font_montserrat_20 }
 
 // default kep map options
-#define DEFAULT_LV_KEY_MAP {            \
-    {KEY_DUP, LV_KEY_UP},               \
-    {KEY_DDOWN, LV_KEY_DOWN},           \
-    {KEY_DRIGHT, LV_KEY_RIGHT},         \
-    {KEY_DLEFT, LV_KEY_LEFT},           \
-    {KEY_L, LV_KEY_ESC},                \
-    {KEY_R, LV_KEY_ENTER},              \
+#include <switch/services/hid.h>
+#define DEFAULT_LV_KEY_MAP {                        \
+    {HidNpadButton_Up, LV_KEY_UP},                  \
+    {HidNpadButton_Down, LV_KEY_DOWN},              \
+    {HidNpadButton_Right, LV_KEY_RIGHT},            \
+    {HidNpadButton_Left, LV_KEY_LEFT},              \
+    {HidNpadButton_L, LV_KEY_ESC},                  \
+    {HidNpadButton_R, LV_KEY_ENTER},                \
 }
 
-#define DEFAULT_ACTION_KEY_MAP          { .goBack = KEY_L, .toggleOverlay = KEY_DUP | KEY_RSTICK_UP }
+#define DEFAULT_ACTION_KEY_MAP {                                            \
+    .goBack = HidNpadButton_L,                                              \
+    .toggleOverlay = HidNpadButton_Up | HidNpadButton_StickRUp              \
+}
 
 // debug options
 // #define DEBUG_LOG_FILE

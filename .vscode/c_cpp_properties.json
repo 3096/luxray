@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "DevkitA64",
+            "includePath": [
+                "/opt/devkitpro/libnx/include",
+                "/opt/devkitpro/portlibs/switch/include",
+                "libs/libluxio/include",
+                "libs/libluxio/lvgl/lvgl",
+                "source"
+            ],
+            "compilerPath": "/opt/devkitpro/devkitA64/bin/aarch64-none-elf-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-arm64"
+        }
+    ],
+    "version": 4
+}
